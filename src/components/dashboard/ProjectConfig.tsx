@@ -1,5 +1,5 @@
 import { CardTitle, Button, Select } from "@/components/ui";
-import { Upload, Play, FileText, X, RefreshCw } from "lucide-react";
+import { Upload, Play, FileText, X, RefreshCw, RotateCcw } from "lucide-react";
 import { useState, useRef, useCallback, type DragEvent } from "react";
 
 const BACKENDS = [
@@ -17,8 +17,11 @@ interface ProjectConfigProps {
   nodeCount: number;
   edgeCount: number;
   error: string | null;
+  hasSolution: boolean;
   onFileLoad: (file: File) => void;
   onLoadDemo: (nodeCount?: number, density?: number) => void;
+  onRunSolution: () => void;
+  onClearSolution: () => void;
 }
 
 export function ProjectConfig({
@@ -26,8 +29,11 @@ export function ProjectConfig({
   nodeCount,
   edgeCount,
   error,
+  hasSolution,
   onFileLoad,
   onLoadDemo,
+  onRunSolution,
+  onClearSolution,
 }: ProjectConfigProps) {
   const [activeLayer, setActiveLayer] = useState(2);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -50,7 +56,6 @@ export function ProjectConfig({
       e.preventDefault();
       e.stopPropagation();
       setIsDragOver(false);
-
       const file = e.dataTransfer.files[0];
       if (file) onFileLoad(file);
     },
@@ -129,7 +134,6 @@ export function ProjectConfig({
           </div>
         )}
 
-        {/* Quick actions */}
         <button
           onClick={() => onLoadDemo(25, 0.25)}
           className="flex w-full items-center justify-center gap-1.5 rounded-md border border-border-subtle bg-bg-surface-2 px-2 py-1.5 text-xs text-text-secondary transition-colors hover:border-border-default hover:text-text-primary"
@@ -172,11 +176,28 @@ export function ProjectConfig({
       {/* Spacer */}
       <div className="flex-1" />
 
-      {/* Run Button */}
-      <Button size="lg" className="w-full text-base font-semibold">
-        <Play className="h-4 w-4" />
-        Run Simulation
-      </Button>
+      {/* Action Buttons */}
+      <div className="flex flex-col gap-2">
+        {hasSolution && (
+          <Button
+            variant="outline"
+            size="md"
+            className="w-full"
+            onClick={onClearSolution}
+          >
+            <RotateCcw className="h-4 w-4" />
+            Clear Solution
+          </Button>
+        )}
+        <Button
+          size="lg"
+          className="w-full text-base font-semibold"
+          onClick={onRunSolution}
+        >
+          <Play className="h-4 w-4" />
+          {hasSolution ? "Re-run Simulation" : "Run Simulation"}
+        </Button>
+      </div>
     </div>
   );
 }

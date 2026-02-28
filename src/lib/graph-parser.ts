@@ -1,7 +1,6 @@
 export interface GraphNode {
   id: string;
   label: string;
-  group?: number;
 }
 
 export interface GraphLink {
@@ -15,10 +14,70 @@ export interface ParsedGraph {
   links: GraphLink[];
 }
 
+/** Max-Cut solution: maps node id -> partition (0 or 1) */
+export type MaxCutSolution = Map<string, 0 | 1>;
+
 /**
- * Parse GML (Graph Modeling Language) format.
- * Handles the standard GML output from NetworkX, QAOA tools, etc.
+ * Determine if a link is a "cut" edge (endpoints in different partitions).
  */
+export function isCutEdge(
+  link: { source: string; target: string },
+  solution: MaxCutSolution
+): boolean {
+  const sp = solution.get(link.source);
+  const tp = solution.get(link.target);
+  if (sp === undefined || tp === undefined) return false;
+  return sp !== tp;
+}
+
+/**
+ * Count cut edges for a given solution.
+ */
+export function countCutEdges(
+  links: GraphLink[],
+  solution: MaxCutSolution
+): number {
+  return links.filter((l) => isCutEdge(l, solution)).length;
+}
+
+/**
+ * Simulate a Max-Cut solution (mock QAOA result).
+ * Assigns each node to partition 0 or 1 using a greedy heuristic
+ * to produce a plausible-looking cut.
+ */
+export function simulateMaxCutSolution(graph: ParsedGraph): MaxCutSolution {
+  const solution: MaxCutSolution = new Map();
+  const adj = new Map<string, string[]>();
+
+  for (const node of graph.nodes) {
+    adj.set(node.id, []);
+  }
+  for (const link of graph.links) {
+    adj.get(link.source)?.push(link.target);
+    adj.get(link.target)?.push(link.source);
+  }
+
+  // Greedy assignment: for each node, pick the partition that maximizes cut edges
+  for (const node of graph.nodes) {
+    const neighbors = adj.get(node.id) ?? [];
+    let count0 = 0;
+    let count1 = 0;
+
+    for (const nId of neighbors) {
+      const np = solution.get(nId);
+      if (np === 0) count0++;
+      else if (np === 1) count1++;
+    }
+
+    // Put in the partition opposite to the majority of already-assigned neighbors
+    solution.set(node.id, count0 >= count1 ? 1 : 0);
+  }
+
+  return solution;
+}
+
+// ---- File Parsers ----
+
 function parseGML(content: string): ParsedGraph {
   const nodes: GraphNode[] = [];
   const links: GraphLink[] = [];
@@ -55,10 +114,6 @@ function parseGML(content: string): ParsedGraph {
   return { nodes, links };
 }
 
-/**
- * Parse JSON graph format.
- * Expects { nodes: [{id, ...}], links/edges: [{source, target, ...}] }
- */
 function parseJSON(content: string): ParsedGraph {
   const data = JSON.parse(content);
   const rawNodes: { id?: string | number; label?: string; [k: string]: unknown }[] =
@@ -80,11 +135,6 @@ function parseJSON(content: string): ParsedGraph {
   return { nodes, links };
 }
 
-/**
- * Parse edge-list format (CSV/TXT).
- * Each line: source,target  OR  source target  OR  source\ttarget
- * Lines starting with # or // are comments.
- */
 function parseEdgeList(content: string): ParsedGraph {
   const nodeSet = new Set<string>();
   const links: GraphLink[] = [];
@@ -110,52 +160,34 @@ function parseEdgeList(content: string): ParsedGraph {
   return { nodes, links };
 }
 
-/**
- * Auto-detect format and parse graph file content.
- */
 export function parseGraphFile(content: string, filename: string): ParsedGraph {
   const ext = filename.toLowerCase().split(".").pop() ?? "";
 
-  if (ext === "gml") {
-    return parseGML(content);
-  }
+  if (ext === "gml") return parseGML(content);
+  if (ext === "json") return parseJSON(content);
 
-  if (ext === "json") {
-    return parseJSON(content);
-  }
-
-  // Try JSON detection for extensionless files
   const trimmed = content.trim();
   if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
     try {
       return parseJSON(content);
     } catch {
-      // fall through to edge list
+      // fall through
     }
   }
 
-  // GML detection
   if (trimmed.includes("graph [") || trimmed.includes("graph\n[")) {
     return parseGML(content);
   }
 
-  // Default: edge list (csv, txt, tsv, etc.)
   return parseEdgeList(content);
 }
 
-/**
- * Generate a demo QAOA-style graph for initial display.
- */
 export function generateDemoGraph(nodeCount: number = 20, edgeDensity: number = 0.3): ParsedGraph {
   const nodes: GraphNode[] = [];
   const links: GraphLink[] = [];
 
   for (let i = 0; i < nodeCount; i++) {
-    nodes.push({
-      id: String(i),
-      label: `Q${i}`,
-      group: Math.floor(i / Math.ceil(nodeCount / 4)),
-    });
+    nodes.push({ id: String(i), label: `Q${i}` });
   }
 
   for (let i = 0; i < nodeCount; i++) {

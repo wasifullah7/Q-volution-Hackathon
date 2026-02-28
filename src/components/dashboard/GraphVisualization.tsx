@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import { Badge } from "@/components/ui";
 import {
@@ -6,21 +6,43 @@ import {
   ZoomOut,
   Maximize2,
   RotateCcw,
-  Lock,
-  Unlock,
   Crosshair,
   Minimize2,
 } from "lucide-react";
-import type { ParsedGraph } from "@/lib/graph-parser";
+import type { ParsedGraph, MaxCutSolution } from "@/lib/graph-parser";
+import { isCutEdge } from "@/lib/graph-parser";
 
+// ── Theme Colors ──────────────────────────────────────────
+const COLORS = {
+  node: "#38BDF8",
+  nodeFill: "#0C4A6E",
+  nodeStroke: "#38BDF8",
+  edge: "rgba(56, 189, 248, 0.15)",
+  edgeWidth: 1,
+  hoverEdge: "rgba(56, 189, 248, 0.5)",
+  hoverEdgeWidth: 2,
+  partition0: "#38BDF8",
+  partition0Fill: "#0C4A6E",
+  partition1: "#A78BFA",
+  partition1Fill: "#4C1D95",
+  cutEdge: "#FBBF24",
+  cutEdgeWidth: 2.5,
+  nonCutEdge: "rgba(71, 85, 105, 0.2)",
+  nonCutEdgeWidth: 0.5,
+  label: "#F1F5F9",
+  labelDim: "#94A3B8",
+  bg: "#0B0F19",
+};
+
+// ── Types ─────────────────────────────────────────────────
 interface GraphVisualizationProps {
   graph: ParsedGraph;
+  solution: MaxCutSolution | null;
 }
 
 interface FGNode {
   id?: string | number;
   label?: string;
-  group?: number;
   x?: number;
   y?: number;
   [key: string]: unknown;
@@ -33,85 +55,58 @@ interface FGLink {
   [key: string]: unknown;
 }
 
-const GROUP_COLORS = [
-  "#38BDF8", // cyan
-  "#A78BFA", // violet
-  "#34D399", // emerald
-  "#FB923C", // orange
-  "#F472B6", // pink
-  "#FBBF24", // amber
-  "#67E8F9", // light cyan
-  "#C084FC", // light violet
-];
-
+// ── Toolbar Button ────────────────────────────────────────
 function ToolbarButton({
   onClick,
   title,
-  active,
   children,
 }: {
   onClick: () => void;
   title: string;
-  active?: boolean;
   children: React.ReactNode;
 }) {
   return (
     <button
       onClick={onClick}
       title={title}
-      className={`flex h-8 w-8 items-center justify-center rounded-md transition-all duration-150 ${
-        active
-          ? "bg-accent-primary text-bg-base"
-          : "bg-bg-surface-2/80 text-text-secondary hover:bg-bg-surface-3 hover:text-text-primary"
-      }`}
+      className="flex h-8 w-8 items-center justify-center rounded-md bg-bg-surface-2/80 text-text-secondary transition-all duration-150 hover:bg-bg-surface-3 hover:text-text-primary"
     >
       {children}
     </button>
   );
 }
 
-export function GraphVisualization({ graph }: GraphVisualizationProps) {
+function getLinkEndpointId(val: string | number | FGNode | undefined): string {
+  if (val === undefined) return "";
+  if (typeof val === "object") return String(val.id ?? "");
+  return String(val);
+}
+
+// ── Component ─────────────────────────────────────────────
+export function GraphVisualization({ graph, solution }: GraphVisualizationProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fgRef = useRef<any>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
-  const [hoveredNode, setHoveredNode] = useState<FGNode | null>(null);
-  const [frozen, setFrozen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [highlightNodes, setHighlightNodes] = useState<Set<string | number>>(new Set());
-  const [highlightLinks, setHighlightLinks] = useState<Set<string>>(new Set());
 
-  // Resize observer
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
+  // Use refs for hover state so callbacks don't trigger re-renders
+  const hoveredNodeRef = useRef<FGNode | null>(null);
+  const highlightNodesRef = useRef<Set<string | number>>(new Set());
+  const highlightLinksRef = useRef<Set<string>>(new Set());
+  const [hoveredNodeDisplay, setHoveredNodeDisplay] = useState<FGNode | null>(null);
 
-    const observer = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        setDimensions({ width: Math.floor(width), height: Math.floor(height) });
-      }
-    });
+  // Stable refs for solution data (avoids callback re-creation)
+  const solutionRef = useRef<MaxCutSolution | null>(null);
+  solutionRef.current = solution;
 
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
+  const hasSolution = solution !== null && solution.size > 0;
 
-  // Fit to view after graph loads
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fgRef.current?.zoomToFit(400, 60);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, [graph]);
-
-  // Build neighbor maps for hover highlighting
+  // Build neighbor map
   const neighborMap = useRef<Map<string | number, Set<string | number>>>(new Map());
   useEffect(() => {
     const map = new Map<string | number, Set<string | number>>();
-    for (const node of graph.nodes) {
-      map.set(node.id, new Set());
-    }
+    for (const node of graph.nodes) map.set(node.id, new Set());
     for (const link of graph.links) {
       map.get(link.source)?.add(link.target);
       map.get(link.target)?.add(link.source);
@@ -119,62 +114,71 @@ export function GraphVisualization({ graph }: GraphVisualizationProps) {
     neighborMap.current = map;
   }, [graph]);
 
-  const handleNodeHover = useCallback(
-    (node: FGNode | null) => {
-      setHoveredNode(node);
-      const hNodes = new Set<string | number>();
-      const hLinks = new Set<string>();
-
-      if (node?.id !== undefined) {
-        hNodes.add(node.id);
-        const neighbors = neighborMap.current.get(node.id);
-        if (neighbors) {
-          for (const nId of neighbors) {
-            hNodes.add(nId);
-            hLinks.add(`${node.id}-${nId}`);
-            hLinks.add(`${nId}-${node.id}`);
-          }
-        }
-      }
-
-      setHighlightNodes(hNodes);
-      setHighlightLinks(hLinks);
-    },
-    []
+  // ── Memoize graphData so it only changes when graph prop changes ──
+  const graphData = useMemo(
+    () => ({
+      nodes: graph.nodes.map((n) => ({ ...n })),
+      links: graph.links.map((l) => ({ ...l })),
+    }),
+    [graph]
   );
 
+  // ── Resize observer ──
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        setDimensions({ width: Math.floor(width), height: Math.floor(height) });
+      }
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
+  // ── Fit to view on graph change (NO pauseAnimation -- that kills the render loop) ──
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fgRef.current?.zoomToFit(400, 60);
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [graph]);
+
+  // ── Node hover -- mutate refs, only setState for the tooltip display ──
+  const handleNodeHover = (node: FGNode | null) => {
+    hoveredNodeRef.current = node;
+    const hNodes = new Set<string | number>();
+    const hLinks = new Set<string>();
+
+    if (node?.id !== undefined) {
+      hNodes.add(node.id);
+      const neighbors = neighborMap.current.get(node.id);
+      if (neighbors) {
+        for (const nId of neighbors) {
+          hNodes.add(nId);
+          hLinks.add(`${node.id}-${nId}`);
+          hLinks.add(`${nId}-${node.id}`);
+        }
+      }
+    }
+    highlightNodesRef.current = hNodes;
+    highlightLinksRef.current = hLinks;
+    setHoveredNodeDisplay(node);
+  };
+
+  // ── Toolbar handlers ──
   const handleZoomIn = () => {
     const current = fgRef.current?.zoom() ?? 1;
     fgRef.current?.zoom(current * 1.4, 300);
   };
-
   const handleZoomOut = () => {
     const current = fgRef.current?.zoom() ?? 1;
     fgRef.current?.zoom(current / 1.4, 300);
   };
-
-  const handleFitView = () => {
-    fgRef.current?.zoomToFit(400, 60);
-  };
-
-  const handleRecenter = () => {
-    fgRef.current?.centerAt(0, 0, 400);
-  };
-
-  const handleReheat = () => {
-    setFrozen(false);
-    fgRef.current?.d3ReheatSimulation();
-  };
-
-  const handleToggleFreeze = () => {
-    if (frozen) {
-      fgRef.current?.resumeAnimation();
-    } else {
-      fgRef.current?.pauseAnimation();
-    }
-    setFrozen(!frozen);
-  };
-
+  const handleFitView = () => fgRef.current?.zoomToFit(400, 60);
+  const handleRecenter = () => fgRef.current?.centerAt(0, 0, 400);
+  const handleReheat = () => fgRef.current?.d3ReheatSimulation();
   const handleToggleFullscreen = () => {
     const el = containerRef.current;
     if (!el) return;
@@ -185,111 +189,138 @@ export function GraphVisualization({ graph }: GraphVisualizationProps) {
     }
   };
 
-  // Listen for external fullscreen changes
   useEffect(() => {
     const handler = () => setIsFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handler);
     return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
 
-  // Custom node renderer
-  const nodeCanvasObject = useCallback(
-    (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
-      const id = node.id ?? "";
-      const label = (node.label as string) ?? String(id);
-      const x = node.x ?? 0;
-      const y = node.y ?? 0;
-      const isHovered = hoveredNode?.id === id;
-      const isHighlighted = highlightNodes.has(id);
-      const group = (node.group as number) ?? 0;
-      const baseColor = GROUP_COLORS[group % GROUP_COLORS.length];
-      const radius = isHovered ? 8 : 6;
+  // ── Node renderer (reads refs directly -- no React state deps that cause re-creation) ──
+  const nodeCanvasObject = (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const id = String(node.id ?? "");
+    const label = (node.label as string) ?? id;
+    const x = node.x ?? 0;
+    const y = node.y ?? 0;
+    const isHovered = hoveredNodeRef.current?.id === node.id;
+    const isNeighborHighlighted = highlightNodesRef.current.has(id);
+    const sol = solutionRef.current;
+    const hasSol = sol !== null && sol.size > 0;
 
-      // Glow for hovered / highlighted
-      if (isHighlighted || isHovered) {
-        ctx.save();
-        ctx.shadowColor = baseColor;
-        ctx.shadowBlur = isHovered ? 25 : 12;
-        ctx.beginPath();
-        ctx.arc(x, y, radius + 2, 0, Math.PI * 2);
-        ctx.fillStyle = "transparent";
-        ctx.fill();
-        ctx.restore();
+    let fillColor: string;
+    let strokeColor: string;
+
+    if (hasSol) {
+      const partition = sol!.get(id);
+      if (partition === 1) {
+        fillColor = COLORS.partition1Fill;
+        strokeColor = COLORS.partition1;
+      } else {
+        fillColor = COLORS.partition0Fill;
+        strokeColor = COLORS.partition0;
       }
+    } else {
+      fillColor = COLORS.nodeFill;
+      strokeColor = COLORS.nodeStroke;
+    }
 
-      // Outer ring
+    const radius = isHovered ? 8 : 6;
+
+    // Glow on hover
+    if (isHovered || isNeighborHighlighted) {
+      ctx.save();
+      ctx.shadowColor = strokeColor;
+      ctx.shadowBlur = isHovered ? 20 : 10;
       ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = isHighlighted ? baseColor : `${baseColor}88`;
+      ctx.arc(x, y, radius + 3, 0, Math.PI * 2);
+      ctx.fillStyle = "transparent";
       ctx.fill();
-      ctx.strokeStyle = baseColor;
-      ctx.lineWidth = isHovered ? 2 : 1;
-      ctx.stroke();
+      ctx.restore();
+    }
 
-      // Inner dot
-      ctx.beginPath();
-      ctx.arc(x, y, radius * 0.4, 0, Math.PI * 2);
-      ctx.fillStyle = "#F1F5F9";
-      ctx.fill();
+    // Filled circle
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = isHovered ? 2.5 : 1.5;
+    ctx.stroke();
 
-      // Label (show when zoomed in enough or hovered)
-      if (globalScale > 1.8 || isHovered) {
-        ctx.font = `${isHovered ? "600" : "500"} ${Math.max(10 / globalScale, 3)}px Inter, sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "top";
-        ctx.fillStyle = isHovered ? "#F1F5F9" : "#94A3B8";
-        ctx.fillText(label, x, y + radius + 2);
-      }
-    },
-    [hoveredNode, highlightNodes]
-  );
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = strokeColor;
+    ctx.fill();
 
-  const linkColor = useCallback(
-    (link: FGLink) => {
-      const sId = typeof link.source === "object" ? link.source?.id : link.source;
-      const tId = typeof link.target === "object" ? link.target?.id : link.target;
-      const key1 = `${sId}-${tId}`;
-      const key2 = `${tId}-${sId}`;
-      if (highlightLinks.has(key1) || highlightLinks.has(key2)) {
-        return "rgba(56, 189, 248, 0.6)";
-      }
-      return "rgba(56, 189, 248, 0.08)";
-    },
-    [highlightLinks]
-  );
-
-  const linkWidth = useCallback(
-    (link: FGLink) => {
-      const sId = typeof link.source === "object" ? link.source?.id : link.source;
-      const tId = typeof link.target === "object" ? link.target?.id : link.target;
-      const key1 = `${sId}-${tId}`;
-      const key2 = `${tId}-${sId}`;
-      return highlightLinks.has(key1) || highlightLinks.has(key2) ? 2 : 0.5;
-    },
-    [highlightLinks]
-  );
-
-  const graphData = {
-    nodes: graph.nodes.map((n) => ({ ...n })),
-    links: graph.links.map((l) => ({ ...l })),
+    // Label
+    if (globalScale > 1.5 || isHovered) {
+      const fontSize = Math.max(10 / globalScale, 3.5);
+      ctx.font = `${isHovered ? 600 : 500} ${fontSize}px "Inter", sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillStyle = isHovered ? COLORS.label : COLORS.labelDim;
+      ctx.fillText(label, x, y + radius + 3);
+    }
   };
+
+  // ── Link color (reads refs directly) ──
+  const linkColor = (link: FGLink) => {
+    const sId = getLinkEndpointId(link.source);
+    const tId = getLinkEndpointId(link.target);
+    const hKey1 = `${sId}-${tId}`;
+    const hKey2 = `${tId}-${sId}`;
+    const isHover = highlightLinksRef.current.has(hKey1) || highlightLinksRef.current.has(hKey2);
+    const sol = solutionRef.current;
+    const hasSol = sol !== null && sol.size > 0;
+
+    if (hasSol) {
+      const cut = isCutEdge({ source: sId, target: tId }, sol!);
+      if (isHover) return cut ? COLORS.cutEdge : COLORS.hoverEdge;
+      return cut ? COLORS.cutEdge : COLORS.nonCutEdge;
+    }
+
+    return isHover ? COLORS.hoverEdge : COLORS.edge;
+  };
+
+  // ── Link width (reads refs directly) ──
+  const linkWidth = (link: FGLink) => {
+    const sId = getLinkEndpointId(link.source);
+    const tId = getLinkEndpointId(link.target);
+    const hKey1 = `${sId}-${tId}`;
+    const hKey2 = `${tId}-${sId}`;
+    const isHover = highlightLinksRef.current.has(hKey1) || highlightLinksRef.current.has(hKey2);
+    const sol = solutionRef.current;
+    const hasSol = sol !== null && sol.size > 0;
+
+    if (hasSol) {
+      const cut = isCutEdge({ source: sId, target: tId }, sol!);
+      if (isHover) return cut ? 3.5 : COLORS.hoverEdgeWidth;
+      return cut ? COLORS.cutEdgeWidth : COLORS.nonCutEdgeWidth;
+    }
+
+    return isHover ? COLORS.hoverEdgeWidth : COLORS.edgeWidth;
+  };
+
+  // Pre-compute cut count for badge
+  const cutEdgeCount = hasSolution
+    ? graph.links.filter((l) => isCutEdge(l, solution!)).length
+    : 0;
 
   return (
     <div
       ref={containerRef}
       className="relative h-full w-full overflow-hidden rounded-lg border border-border-subtle bg-bg-base"
     >
-      {/* Force Graph */}
       <ForceGraph2D
         ref={fgRef}
         width={dimensions.width}
         height={dimensions.height}
         graphData={graphData}
-        backgroundColor="#0B0F19"
+        backgroundColor={COLORS.bg}
         nodeCanvasObject={nodeCanvasObject}
         nodePointerAreaPaint={(node: FGNode, color: string, ctx: CanvasRenderingContext2D) => {
           ctx.beginPath();
-          ctx.arc(node.x ?? 0, node.y ?? 0, 10, 0, Math.PI * 2);
+          ctx.arc(node.x ?? 0, node.y ?? 0, 12, 0, Math.PI * 2);
           ctx.fillStyle = color;
           ctx.fill();
         }}
@@ -301,21 +332,72 @@ export function GraphVisualization({ graph }: GraphVisualizationProps) {
         d3VelocityDecay={0.3}
         warmupTicks={100}
         cooldownTicks={200}
+        cooldownTime={5000}
         enableZoomInteraction={true}
         enablePanInteraction={true}
         enableNodeDrag={true}
-        minZoom={0.3}
-        maxZoom={12}
+        minZoom={0.2}
+        maxZoom={15}
       />
 
-      {/* Stats Bar -- top left */}
+      {/* ── Stats overlay ── */}
       <div className="absolute left-3 top-3 flex items-center gap-2">
         <Badge variant="primary">Nodes: {graph.nodes.length}</Badge>
         <Badge variant="secondary">Edges: {graph.links.length}</Badge>
-        {frozen && <Badge variant="warning">Paused</Badge>}
+        {hasSolution && (
+          <Badge variant="warning">
+            Cut: {cutEdgeCount} / {graph.links.length}
+          </Badge>
+        )}
       </div>
 
-      {/* Toolbar -- top right */}
+      {/* ── Legend (only when solution is active) ── */}
+      {hasSolution && (
+        <div className="absolute bottom-3 left-3 rounded-lg border border-border-subtle bg-bg-surface-1/90 px-3 py-2 backdrop-blur-sm">
+          <p className="mb-1.5 font-display text-[10px] font-semibold uppercase tracking-wider text-text-secondary">
+            Max-Cut Solution
+          </p>
+          <div className="flex flex-col gap-1 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full border-2" style={{ borderColor: COLORS.partition0, backgroundColor: COLORS.partition0Fill }} />
+              <span className="text-text-secondary">Partition 0</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-full border-2" style={{ borderColor: COLORS.partition1, backgroundColor: COLORS.partition1Fill }} />
+              <span className="text-text-secondary">Partition 1</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="rounded" style={{ backgroundColor: COLORS.cutEdge, width: 14, height: 3 }} />
+              <span className="text-text-secondary">Cut edge</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="rounded" style={{ backgroundColor: "#475569", width: 14, height: 2, opacity: 0.4 }} />
+              <span className="text-text-secondary">Non-cut edge</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Hovered node info ── */}
+      {hoveredNodeDisplay && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg border border-border-subtle bg-bg-surface-1/90 px-3 py-2 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <span className="font-display text-sm font-semibold text-accent-primary">
+              {(hoveredNodeDisplay.label as string) ?? String(hoveredNodeDisplay.id)}
+            </span>
+            <span className="text-xs text-text-tertiary">
+              {neighborMap.current.get(hoveredNodeDisplay.id!)?.size ?? 0} connections
+            </span>
+            {hasSolution && (
+              <span className="text-xs" style={{ color: solution!.get(String(hoveredNodeDisplay.id)) === 1 ? COLORS.partition1 : COLORS.partition0 }}>
+                Partition {solution!.get(String(hoveredNodeDisplay.id)) ?? "?"}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Toolbar ── */}
       <div className="absolute right-3 top-3 flex flex-col gap-1.5 rounded-lg border border-border-subtle bg-bg-surface-1/90 p-1.5 backdrop-blur-sm">
         <ToolbarButton onClick={handleZoomIn} title="Zoom In">
           <ZoomIn className="h-4 w-4" />
@@ -334,36 +416,15 @@ export function GraphVisualization({ graph }: GraphVisualizationProps) {
           <RotateCcw className="h-4 w-4" />
         </ToolbarButton>
         <div className="mx-1 border-t border-border-subtle" />
-        <ToolbarButton onClick={handleToggleFreeze} title={frozen ? "Resume" : "Freeze"} active={frozen}>
-          {frozen ? <Unlock className="h-4 w-4" /> : <Lock className="h-4 w-4" />}
-        </ToolbarButton>
         <ToolbarButton onClick={handleToggleFullscreen} title="Fullscreen">
-          {isFullscreen ? (
-            <Minimize2 className="h-4 w-4" />
-          ) : (
-            <Maximize2 className="h-4 w-4" />
-          )}
+          {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
         </ToolbarButton>
       </div>
 
-      {/* Hovered Node Info -- bottom left */}
-      {hoveredNode && (
-        <div className="absolute bottom-3 left-3 rounded-lg border border-border-subtle bg-bg-surface-1/90 px-3 py-2 backdrop-blur-sm">
-          <div className="flex items-center gap-2">
-            <span className="font-display text-sm font-semibold text-accent-primary">
-              {(hoveredNode.label as string) ?? String(hoveredNode.id)}
-            </span>
-            <span className="text-xs text-text-tertiary">
-              {neighborMap.current.get(hoveredNode.id!)?.size ?? 0} connections
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Keyboard Hints -- bottom right */}
+      {/* ── Keyboard hints ── */}
       <div className="absolute bottom-3 right-3 flex items-center gap-2 text-[10px] text-text-tertiary">
         <span>Scroll: zoom</span>
-        <span>Drag canvas: pan</span>
+        <span>Drag bg: pan</span>
         <span>Drag node: move</span>
       </div>
     </div>

@@ -9,7 +9,18 @@ import {
 import { useGraphData } from "@/hooks/useGraphData";
 
 export default function App() {
-  const { graph, filename, error, loadFile, loadDemo } = useGraphData();
+  const {
+    graph,
+    filename,
+    error,
+    solution,
+    loadFile,
+    loadDemo,
+    runSolution,
+    clearSolution,
+  } = useGraphData();
+
+  const hasSolution = solution !== null && solution.size > 0;
 
   return (
     <Layout
@@ -19,11 +30,14 @@ export default function App() {
           nodeCount={graph.nodes.length}
           edgeCount={graph.links.length}
           error={error}
+          hasSolution={hasSolution}
           onFileLoad={loadFile}
           onLoadDemo={loadDemo}
+          onRunSolution={runSolution}
+          onClearSolution={clearSolution}
         />
       }
-      main={<GraphVisualization graph={graph} />}
+      main={<GraphVisualization graph={graph} solution={solution} />}
       aside={
         <div className="flex h-full flex-col gap-6">
           <TechnicalMetrics />
