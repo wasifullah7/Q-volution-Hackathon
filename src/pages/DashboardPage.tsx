@@ -17,6 +17,7 @@ import {
   type SimulationStatus,
   type SimulationData,
 } from "@/types/simulation";
+import { exportReport } from "@/utils/exportReport";
 
 export function DashboardPage() {
   const {
@@ -32,6 +33,7 @@ export function DashboardPage() {
 
   const [simStatus, setSimStatus] = useState<SimulationStatus>("idle");
   const [simData, setSimData] = useState<SimulationData>(INITIAL_SIMULATION);
+  const [isExporting, setIsExporting] = useState(false);
 
   const hasSolution = solution !== null && solution.size > 0;
 
@@ -56,6 +58,22 @@ export function DashboardPage() {
     setSimData(INITIAL_SIMULATION);
     setSimStatus("idle");
   }, [clearSolution]);
+
+  const handleExport = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      await exportReport({
+        simData,
+        nodeCount: graph.nodes.length,
+        edgeCount: graph.links.length,
+        filename: filename || "demo-graph.gml",
+      });
+    } catch (err) {
+      console.error("Export failed:", err);
+    } finally {
+      setIsExporting(false);
+    }
+  }, [simData, graph.nodes.length, graph.links.length, filename]);
 
   return (
     <Layout
@@ -94,29 +112,37 @@ export function DashboardPage() {
 
           {/* Top Left - Quantum Circuit Visualizer */}
           <FullscreenCard>
-            <GraphVisualization graph={graph} solution={solution} />
+            <div id="chart-graph" className="flex flex-1 flex-col">
+              <GraphVisualization graph={graph} solution={solution} />
+            </div>
           </FullscreenCard>
 
           {/* Top Right - Sustainability Scorecard */}
           <FullscreenCard>
-            <SustainabilityScorecard />
+            <div id="chart-sustainability" className="flex flex-1 flex-col">
+              <SustainabilityScorecard />
+            </div>
           </FullscreenCard>
 
           {/* Bottom Left - State Distribution */}
           <FullscreenCard>
-            <StateDistribution data={simData.stateDistribution} />
+            <div id="chart-distribution" className="flex flex-1 flex-col">
+              <StateDistribution data={simData.stateDistribution} />
+            </div>
           </FullscreenCard>
 
           {/* Bottom Right - Measurement Results */}
           <FullscreenCard>
-            <MeasurementResults data={simData.measurements} />
+            <div id="chart-measurements" className="flex flex-1 flex-col">
+              <MeasurementResults data={simData.measurements} />
+            </div>
           </FullscreenCard>
         </div>
       }
       aside={
         <div className="flex h-full flex-col gap-6">
           <TechnicalMetrics data={simData.metrics} />
-          <AIAnalysis simStatus={simStatus} />
+          <AIAnalysis simStatus={simStatus} onExport={handleExport} isExporting={isExporting} />
         </div>
       }
     />

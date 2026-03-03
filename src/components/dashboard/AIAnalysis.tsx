@@ -19,12 +19,21 @@ const AI_RESPONSES: Record<string, string> = {
     "MEPS (Mean Energy Per Shot) of 0.731 quantifies the average solution quality across all measurement shots. Values closer to 1.0 indicate that most shots return near-optimal solutions. The current value suggests moderate concentration around the optimal — increasing shot count from 1024 to 4096 could help identify better solutions.",
   depth:
     "Circuit depth of 38 is within the coherence window of the Rigetti Ankaa-2 processor (T1 ~ 20\u03bcs, gate time ~ 60ns). However, for deeper circuits (p=3,4), decoherence effects may become significant. Consider using error mitigation techniques like ZNE (Zero Noise Extrapolation) for improved results.",
+  summary:
+    "Simulation complete! The QAOA circuit with p=2 layers converged in 73 iterations on the Rigetti QPU. Optimal cut value: -10.57 with MEPS 0.731. Circuit compiled to 71 total gates (depth 38). Energy savings: ~10% vs classical. Ask me about any specific metric for deeper analysis.",
   default:
     "Based on the current QAOA simulation: The 9-node graph was optimized using p=2 layers on the Rigetti QPU. Key findings include an optimal cut value of -10.57, 73 optimization iterations, and a MEPS of 0.731. The circuit compiled to 46 single-qubit and 25 two-qubit gates with depth 38. Try asking about specific metrics like 'gates', 'energy savings', 'convergence', or 'optimal value'.",
 };
 
-function getAIResponse(question: string): string {
+function getAIResponse(question: string, simStatus: SimulationStatus): string {
+  if (simStatus !== "completed") {
+    return "No simulation data available yet. Please run a simulation first, then ask me about the results.";
+  }
+
   const q = question.toLowerCase();
+
+  if (q.includes("summar") || q.includes("overview") || q.includes("analyz") || q.includes("analys") || q.includes("report"))
+    return AI_RESPONSES.summary;
   if (q.includes("converg") || q.includes("iteration") || q.includes("optimiz"))
     return AI_RESPONSES.convergence;
   if (q.includes("energy") || q.includes("carbon") || q.includes("sustain") || q.includes("green") || q.includes("eco"))
@@ -44,13 +53,15 @@ function getAIResponse(question: string): string {
 
 interface AIAnalysisProps {
   simStatus: SimulationStatus;
+  onExport?: () => void;
+  isExporting?: boolean;
 }
 
-export function AIAnalysis({ simStatus }: AIAnalysisProps) {
+export function AIAnalysis({ simStatus, onExport, isExporting }: AIAnalysisProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       role: "ai",
-      content: "Ready to analyze your QAOA results. Run a simulation to get started.",
+      content: "Ready to analyze your QAOA results. Run a simulation and then ask me anything about the results.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -61,22 +72,16 @@ export function AIAnalysis({ simStatus }: AIAnalysisProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // When simulation completes, auto-add analysis message
+  // When simulation completes, update the status message (no auto AI response)
   useEffect(() => {
     if (simStatus === "completed") {
-      setIsTyping(true);
-      const timer = setTimeout(() => {
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "ai",
-            content:
-              "Simulation complete! The QAOA circuit with p=2 layers converged in 73 iterations on the Rigetti QPU. Optimal cut value: -10.57 with MEPS 0.731. Circuit compiled to 71 total gates (depth 38). Energy savings: ~10% vs classical. Ask me about any specific metric for deeper analysis.",
-          },
-        ]);
-        setIsTyping(false);
-      }, 1500);
-      return () => clearTimeout(timer);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "ai",
+          content: "Simulation finished. Ask me anything — try 'summary', 'gates', 'energy', 'convergence', 'optimal', 'meps', or 'depth'.",
+        },
+      ]);
     }
   }, [simStatus]);
 
@@ -89,7 +94,7 @@ export function AIAnalysis({ simStatus }: AIAnalysisProps) {
     setIsTyping(true);
 
     setTimeout(() => {
-      const response = getAIResponse(trimmed);
+      const response = getAIResponse(trimmed, simStatus);
       setMessages((prev) => [...prev, { role: "ai", content: response }]);
       setIsTyping(false);
     }, 800 + Math.random() * 700);
@@ -169,9 +174,13 @@ export function AIAnalysis({ simStatus }: AIAnalysisProps) {
       </div>
 
       {/* Export Report */}
-      <button className="flex w-full items-center justify-center gap-2 rounded-lg border border-border-subtle bg-bg-surface-2 px-4 py-3 font-display text-sm font-semibold uppercase tracking-wider text-text-primary transition-colors hover:border-accent-primary hover:text-accent-primary">
-        <Download className="h-4 w-4" />
-        Export Report
+      <button
+        onClick={onExport}
+        disabled={isExporting}
+        className="flex w-full items-center justify-center gap-2 rounded-lg border border-border-subtle bg-bg-surface-2 px-4 py-3 font-display text-sm font-semibold uppercase tracking-wider text-text-primary transition-colors hover:border-accent-primary hover:text-accent-primary disabled:opacity-50"
+      >
+        <Download className={`h-4 w-4 ${isExporting ? "animate-bounce" : ""}`} />
+        {isExporting ? "Generating PDF..." : "Export Report"}
       </button>
     </div>
   );

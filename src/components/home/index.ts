@@ -7,3 +7,4 @@ export * from "./StatsSection";
 export * from "./CTASection";
 export * from "./ContactSection";
 export * from "./Footer";
+export * from "./SiteLayout";

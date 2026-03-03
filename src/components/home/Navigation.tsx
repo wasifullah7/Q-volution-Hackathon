@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import { Search, Moon, Sun } from "lucide-react";
 import { Logo } from "./Logo";
@@ -7,12 +7,14 @@ import { useTheme } from "@/context/ThemeContext";
 export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { pathname } = useLocation();
 
   const navLinks = [
+    { label: "Dashboard", href: "/dashboard" },
     { label: "Documentation", href: "/documentation" },
     { label: "Accuracy/Technical Metrics", href: "/accuracy" },
-    { label: "Creativity/Novelty", href: "#creativity" },
-    { label: "Use of Rigetti Features", href: "#rigetti" },
+    { label: "Creativity/Novelty", href: "/creativity" },
+    { label: "Use of Rigetti Features", href: "/rigetti" },
   ];
 
   return (
@@ -27,15 +29,22 @@ export function Navigation() {
 
         {/* Desktop Navigation - Centered */}
         <nav className="hidden flex-1 items-center justify-center gap-7 md:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className="text-[12px] font-medium text-text-secondary transition-colors hover:text-text-primary"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.label}
+                to={link.href}
+                className={`text-[12px] font-medium transition-colors hover:text-text-primary ${
+                  isActive
+                    ? "text-accent-primary"
+                    : "text-text-secondary"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         {/* Right Side - Search + Theme Toggle + CTA */}
@@ -86,16 +95,23 @@ export function Navigation() {
       {mobileMenuOpen && (
         <div className="border-t border-border-subtle bg-bg-surface-1 px-6 py-4 md:hidden">
           <nav className="flex flex-col gap-2">
-            {navLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="py-2 text-[13px] text-text-secondary"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </a>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className={`py-2 text-[13px] ${
+                    isActive
+                      ? "text-accent-primary font-medium"
+                      : "text-text-secondary"
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <a
               href="#contact"
               className="mt-2 flex items-center justify-center gap-1.5 rounded-md border border-accent-primary py-2 text-[12px] font-semibold text-accent-primary"
