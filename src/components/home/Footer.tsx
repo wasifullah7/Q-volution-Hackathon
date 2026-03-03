@@ -1,14 +1,23 @@
 import { Link } from "react-router-dom";
+import { Logo } from "./Logo";
 
 export function Footer() {
   const footerLinks = {
-    Product: ["Features", "Pricing", "Documentation", "API Reference"],
-    Company: ["About", "Blog", "Careers", "Contact"],
-    Resources: ["Community", "Help Center", "Partners", "Status"],
-    Legal: ["Privacy", "Terms", "Security", "Cookies"],
+    "Solutions for": ["Enterprises", "Researchers", "Communities", "Quantum Experts"],
+    Product: ["Platform", "Events", "Discussions", "Blog", "Job Board", "QAAS"],
+    "About us": ["Our Team", "Press", "Contact"],
   };
 
   const socialLinks = [
+    {
+      name: "LinkedIn",
+      href: "#",
+      icon: (
+        <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.174-.54.57-1.097 1.234-1.097.868 0 1.217.66 1.217 1.629v3.495h2.4V8.946c0-2.14-1.142-3.135-2.665-3.135-1.228 0-1.77.667-2.073 1.13h.02V6.169H9.08c.03.678 0 7.225 0 7.225h2.4z" />
+        </svg>
+      ),
+    },
     {
       name: "GitHub",
       href: "#",
@@ -24,15 +33,6 @@ export function Footer() {
       icon: (
         <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
           <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z" />
-        </svg>
-      ),
-    },
-    {
-      name: "LinkedIn",
-      href: "#",
-      icon: (
-        <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.174-.54.57-1.097 1.234-1.097.868 0 1.217.66 1.217 1.629v3.495h2.4V8.946c0-2.14-1.142-3.135-2.665-3.135-1.228 0-1.77.667-2.073 1.13h.02V6.169H9.08c.03.678 0 7.225 0 7.225h2.4z" />
         </svg>
       ),
     },
@@ -53,18 +53,18 @@ export function Footer() {
         <div className="grid gap-8 lg:grid-cols-6 lg:gap-12">
           {/* Logo Column */}
           <div className="lg:col-span-2">
-            <Link to="/" className="mb-5 flex items-center">
-              <img src="/logo.png" alt="Ele(Q)tric" className="h-[18px] w-auto" />
+            <Link to="/" className="mb-5 inline-block">
+              <Logo size="md" />
             </Link>
             <p className="mb-6 text-[13px] leading-[1.6] text-gray-500 max-w-[260px]">
-              Quantum optimization for energy grid resilience.
+              Quantum Optimization for Energy Grid Resilience
             </p>
             <div className="flex gap-3">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
-                  className="text-gray-500 transition-colors hover:text-[#00d4ff]"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-gray-500 transition-colors hover:text-[#00d4ff] hover:border-[#00d4ff]/30"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -98,14 +98,17 @@ export function Footer() {
         {/* Bottom Row */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 md:flex-row">
           <p className="text-[12px] text-gray-600">
-            © 2026 Ele(Q)tric. All rights reserved.
+            &copy; 2025 - Ele-Q-tric
           </p>
           <div className="flex items-center gap-6">
             <a href="#" className="text-[12px] text-gray-600 transition-colors hover:text-[#00d4ff]">
               Privacy Policy
             </a>
             <a href="#" className="text-[12px] text-gray-600 transition-colors hover:text-[#00d4ff]">
-              Terms of Service
+              Terms &amp; Conditions
+            </a>
+            <a href="#" className="text-[12px] text-gray-600 transition-colors hover:text-[#00d4ff]">
+              Legal Notice
             </a>
           </div>
         </div>

@@ -1,3 +1,4 @@
+export * from "./Logo";
 export * from "./Navigation";
 export * from "./HeroSection";
 export * from "./ProblemSection";

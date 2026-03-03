@@ -1,10 +1,10 @@
 import { CardTitle, Button, Select } from "@/components/ui";
-import { Upload, Play, FileText, X, RefreshCw, RotateCcw } from "lucide-react";
+import { Play, FileText, X, RotateCcw, Leaf, Loader2 } from "lucide-react";
 import { useState, useRef, useCallback, type DragEvent } from "react";
 
 const BACKENDS = [
-  { value: "qiskit", label: "Qiskit Simulator" },
   { value: "rigetti", label: "Rigetti QPU" },
+  { value: "qiskit", label: "Qiskit Simulator" },
   { value: "both", label: "Compare Both" },
 ];
 
@@ -18,6 +18,7 @@ interface ProjectConfigProps {
   edgeCount: number;
   error: string | null;
   hasSolution: boolean;
+  isLoading: boolean;
   onFileLoad: (file: File) => void;
   onLoadDemo: (nodeCount?: number, density?: number) => void;
   onRunSolution: () => void;
@@ -30,6 +31,7 @@ export function ProjectConfig({
   edgeCount,
   error,
   hasSolution,
+  isLoading,
   onFileLoad,
   onLoadDemo,
   onRunSolution,
@@ -75,6 +77,9 @@ export function ProjectConfig({
     [onFileLoad]
   );
 
+  const displayName = filename || "requirements.txt";
+  const hasGraph = nodeCount > 0;
+
   return (
     <div className="flex h-full flex-col gap-5">
       <CardTitle>Project Config</CardTitle>
@@ -104,27 +109,19 @@ export function ProjectConfig({
               : "border-border-subtle bg-bg-surface-2 hover:border-accent-primary/50 hover:bg-bg-surface-3"
           }`}
         >
-          {filename ? (
-            <>
-              <FileText className="h-7 w-7 text-accent-primary" />
-              <span className="max-w-full truncate font-mono text-sm text-accent-primary">
-                {filename}
-              </span>
-              <span className="tabular-nums text-[11px] text-text-tertiary">
-                {nodeCount} nodes &middot; {edgeCount} edges
-              </span>
-            </>
-          ) : (
-            <>
-              <Upload className="h-7 w-7 text-text-tertiary" />
-              <span className="text-xs text-text-secondary">
-                Drop file or click to browse
-              </span>
-            </>
-          )}
-          <span className="text-[10px] text-text-tertiary">
-            .gml, .json, .csv, .txt
+          <FileText className="h-7 w-7 text-accent-primary" />
+          <span className="max-w-full truncate font-mono text-sm text-accent-primary">
+            {displayName}
           </span>
+          {hasGraph ? (
+            <span className="tabular-nums text-[11px] text-text-tertiary">
+              {nodeCount} nodes &middot; {edgeCount} edges
+            </span>
+          ) : (
+            <span className="text-[11px] text-text-tertiary">
+              Click or drop to replace
+            </span>
+          )}
         </div>
 
         {error && (
@@ -133,14 +130,6 @@ export function ProjectConfig({
             {error}
           </div>
         )}
-
-        <button
-          onClick={() => onLoadDemo(25, 0.25)}
-          className="flex w-full items-center justify-center gap-1.5 rounded-md border border-border-subtle bg-bg-surface-2 px-2 py-1.5 text-xs text-text-secondary transition-colors hover:border-border-default hover:text-text-primary"
-        >
-          <RefreshCw className="h-3 w-3" />
-          Generate Random Graph
-        </button>
       </div>
 
       {/* Backend */}
@@ -148,7 +137,7 @@ export function ProjectConfig({
         <label className="font-body text-xs font-medium uppercase tracking-wider text-text-secondary">
           Backend
         </label>
-        <Select options={BACKENDS} defaultValue="qiskit" />
+        <Select options={BACKENDS} defaultValue="rigetti" />
       </div>
 
       {/* QAOA Layers */}
@@ -177,8 +166,8 @@ export function ProjectConfig({
       <div className="flex-1" />
 
       {/* Action Buttons */}
-      <div className="flex flex-col gap-2">
-        {hasSolution && (
+      <div className="flex flex-col gap-3">
+        {hasSolution && !isLoading && (
           <Button
             variant="outline"
             size="md"
@@ -192,11 +181,32 @@ export function ProjectConfig({
         <Button
           size="lg"
           className="w-full text-base font-semibold"
-          onClick={onRunSolution}
+          onClick={() => {
+            if (!hasGraph) onLoadDemo(9, 0.6);
+            onRunSolution();
+          }}
+          disabled={isLoading}
         >
-          <Play className="h-4 w-4" />
-          {hasSolution ? "Re-run Simulation" : "Run Simulation"}
+          {isLoading ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Simulating...
+            </>
+          ) : (
+            <>
+              <Play className="h-4 w-4" />
+              {hasSolution ? "Re-run Simulation" : "Run Simulation"}
+            </>
+          )}
         </Button>
+
+        {/* Eco Mode Indicator */}
+        <div className="flex items-center justify-center gap-2 py-1">
+          <Leaf className="h-3.5 w-3.5 text-success" />
+          <span className="font-display text-xs font-semibold uppercase tracking-wider text-success">
+            Eco-Mode Active
+          </span>
+        </div>
       </div>
     </div>
   );

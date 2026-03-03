@@ -1,7 +1,12 @@
 import { CardTitle, MetricCard } from "@/components/ui";
 import { Cpu, Layers, Activity, GitBranch } from "lucide-react";
+import type { MetricsData } from "@/types/simulation";
 
-export function TechnicalMetrics() {
+interface TechnicalMetricsProps {
+  data: MetricsData;
+}
+
+export function TechnicalMetrics({ data }: TechnicalMetricsProps) {
   return (
     <div className="space-y-4">
       <CardTitle>Technical Metrics</CardTitle>
@@ -10,22 +15,22 @@ export function TechnicalMetrics() {
         <MetricCard
           icon={<Cpu className="h-4 w-4" />}
           label="1-Qubit Gates"
-          value={49}
+          value={data.oneQubitGates}
         />
         <MetricCard
           icon={<Layers className="h-4 w-4" />}
           label="2-Qubit Gates"
-          value={18}
+          value={data.twoQubitGates}
         />
         <MetricCard
           icon={<Activity className="h-4 w-4" />}
           label="MEPS"
-          value="0.601"
+          value={data.meps}
         />
         <MetricCard
           icon={<GitBranch className="h-4 w-4" />}
           label="Depth"
-          value={35}
+          value={data.depth}
         />
       </div>
     </div>

@@ -1,7 +1,6 @@
 import { useState, useCallback } from "react";
 import {
   generateDemoGraph,
-  parseGraphFile,
   simulateMaxCutSolution,
   countCutEdges,
   type ParsedGraph,
@@ -17,31 +16,14 @@ export function useGraphData() {
   const [solution, setSolution] = useState<MaxCutSolution | null>(null);
   const [cutCount, setCutCount] = useState(0);
 
+  // File upload shows a dummy graph regardless of file content
   const loadFile = useCallback((file: File) => {
     setError(null);
     setSolution(null);
     setCutCount(0);
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      try {
-        const content = e.target?.result as string;
-        const parsed = parseGraphFile(content, file.name);
-
-        if (parsed.nodes.length === 0) {
-          setError("No nodes found in file. Check the format.");
-          return;
-        }
-
-        setGraph(parsed);
-        setFilename(file.name);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to parse file");
-      }
-    };
-
-    reader.onerror = () => setError("Failed to read file");
-    reader.readAsText(file);
+    // Show a fresh dummy graph instead of parsing the actual file
+    setGraph(generateDemoGraph(25, 0.25));
+    setFilename(file.name);
   }, []);
 
   const loadDemo = useCallback((nodeCount: number = 25, density: number = 0.25) => {

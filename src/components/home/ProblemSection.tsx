@@ -1,15 +1,17 @@
-import { Link } from "react-router-dom";
-
 export function ProblemSection() {
   return (
-    <section className="bg-[#060b16] pt-20 pb-32">
-      <div className="mx-auto max-w-[1000px] px-6 lg:px-0">
+    <section className="relative overflow-hidden bg-[#060b16] pt-20 pb-32">
+      {/* Gradient Lighting Effect */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#0a1628_0%,#060b16_100%)] opacity-50" />
+
+      <div className="relative z-10 mx-auto max-w-[1000px] px-6 lg:px-0">
         <div className="flex flex-col">
           {/* Section Header */}
           <div className="mb-16 w-full">
-            <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#4a4a6a]">Problem Statement</div>
+            <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#00d4ff]">Problem Statement</div>
             <h2 className="max-w-[800px] text-[32px] font-bold leading-[1.2] tracking-[-0.03em] text-white sm:text-[36px]">
-              In South Carolina, there was an average of <span className="text-[#00d4ff]">53 hours of blackouts</span> in 2024 nearly <span className="text-[#00d4ff]">5x</span> the national average.
+              In South Carolina , there was an average of <span className="text-[#00d4ff]">53 hours of blackouts</span> in 2024-
+              nearly <span className="text-[#00d4ff] underline decoration-[#00d4ff]">5x</span> the national average.
             </h2>
           </div>
 
@@ -29,27 +31,27 @@ export function ProblemSection() {
                 </p>
               </div>
 
-              <Link
-                to="#"
+              <a
+                href="#"
                 className="inline-flex items-center gap-2 rounded-md bg-[#00d4ff] px-6 py-3 text-[14px] font-bold text-black transition-all hover:bg-[#00c4ec]"
               >
                 Read Full Documentation
                 <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </Link>
+              </a>
             </div>
 
-            {/* Right Column - Image (Reduced size) */}
+            {/* Right Column - SC Grid Image */}
             <div className="relative flex flex-col items-center lg:items-end">
               <div className="w-full max-w-[400px]">
-                <img 
-                  src="/southcarilona.png" 
-                  alt="South Carolina Grid Map" 
+                <img
+                  src="/southcarilona.png"
+                  alt="South Carolina Grid Map"
                   className="w-full h-auto block opacity-90 rounded-lg shadow-2xl"
                 />
                 <p className="mt-4 text-[11px] text-gray-600 text-center lg:text-right">
-                  Source: <span className="underline cursor-pointer"><a href="https://felt.com/explore/us-electric-power-transmission-lines-south-carolina" target="_blank" rel="noopener noreferrer">US Electric Power Transmission Lines in South Carolina</a></span>
+                  Source: <a href="https://felt.com/explore/us-electric-power-transmission-lines-south-carolina" target="_blank" rel="noopener noreferrer" className="underline cursor-pointer hover:text-gray-400">US Electric Power Transmission Lines in South Carolina</a>
                 </p>
               </div>
             </div>

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Header } from "./Header";
+import { Navigation } from "@/components/home/Navigation";
 
 interface LayoutProps {
   sidebar: ReactNode;
@@ -10,13 +10,13 @@ interface LayoutProps {
 export function Layout({ sidebar, main, aside }: LayoutProps) {
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-bg-base">
-      <Header />
-      <div className="flex flex-1 overflow-hidden">
+      <Navigation />
+      <div className="flex flex-1 overflow-hidden pt-14">
         <aside className="w-72 shrink-0 overflow-y-auto border-r border-border-subtle bg-bg-surface-1 p-5">
           {sidebar}
         </aside>
 
-        <main className="relative flex flex-1 flex-col overflow-hidden">
+        <main className="relative flex flex-1 flex-col overflow-y-auto p-4">
           {main}
         </main>
 

@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, Badge } from "@/components/ui";
+import { Target } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -8,19 +8,11 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import type { MeasurementData } from "@/types/simulation";
 
-const QISKIT_DATA = [
-  { bitstring: "01101110", qiskit: 435, rigetti: 280 },
-  { bitstring: "11001011", qiskit: 380, rigetti: 310 },
-  { bitstring: "10001010", qiskit: 340, rigetti: 295 },
-  { bitstring: "10001101", qiskit: 310, rigetti: 270 },
-  { bitstring: "01011010", qiskit: 275, rigetti: 260 },
-  { bitstring: "11010010", qiskit: 240, rigetti: 250 },
-  { bitstring: "01001100", qiskit: 210, rigetti: 240 },
-  { bitstring: "10000001", qiskit: 185, rigetti: 230 },
-  { bitstring: "01110100", qiskit: 160, rigetti: 210 },
-  { bitstring: "00110010", qiskit: 140, rigetti: 195 },
-];
+interface MeasurementResultsProps {
+  data: MeasurementData;
+}
 
 function CustomTooltip({
   active,
@@ -41,36 +33,32 @@ function CustomTooltip({
           className="tabular-nums text-xs"
           style={{ color: entry.color }}
         >
-          {entry.name}: {entry.value}
+          Count: {entry.value}
         </p>
       ))}
     </div>
   );
 }
 
-export function MeasurementResults() {
+export function MeasurementResults({ data }: MeasurementResultsProps) {
   return (
-    <div className="space-y-3">
-      <CardHeader className="mb-0">
-        <CardTitle>Measurement Results</CardTitle>
-        <Badge variant="secondary">Compare</Badge>
-      </CardHeader>
+    <div className="flex h-full flex-col rounded-lg border border-border-subtle bg-bg-surface-1 p-5">
+      <div className="mb-3 flex items-center gap-2">
+        <Target className="h-4 w-4 text-accent-primary" />
+        <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-accent-primary">
+          Measurement Results
+        </h3>
+      </div>
 
-      <Card className="p-3">
-        <div className="mb-2 flex items-center gap-3 text-[11px] text-text-secondary">
-          <div className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-data-1" />
-            Qiskit
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-data-2" />
-            Rigetti
-          </div>
-        </div>
+      <div className="mb-2 flex items-center gap-2 text-[11px] text-text-secondary">
+        <span className="h-2 w-2 rounded-full bg-accent-primary" />
+        Rigetti QPU
+      </div>
 
-        <div className="h-40 w-full">
+      <div className="flex-1">
+        <div className="h-44 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={QISKIT_DATA} barGap={1}>
+            <BarChart data={data.entries} barGap={2}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="#2A3450"
@@ -78,10 +66,13 @@ export function MeasurementResults() {
               />
               <XAxis
                 dataKey="bitstring"
-                tick={false}
+                tick={{ fontSize: 9, fill: "#94A3B8", fontFamily: "JetBrains Mono, monospace" }}
                 axisLine={{ stroke: "#2A3450" }}
                 tickLine={false}
-                height={5}
+                angle={-45}
+                textAnchor="end"
+                height={50}
+                interval={0}
               />
               <YAxis
                 tick={{ fontSize: 10, fill: "#94A3B8" }}
@@ -91,32 +82,25 @@ export function MeasurementResults() {
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar
-                dataKey="qiskit"
-                name="Qiskit"
+                dataKey="count"
+                name="Rigetti QPU"
                 fill="#38BDF8"
                 radius={[2, 2, 0, 0]}
-                maxBarSize={12}
-              />
-              <Bar
-                dataKey="rigetti"
-                name="Rigetti"
-                fill="#A78BFA"
-                radius={[2, 2, 0, 0]}
-                maxBarSize={12}
+                maxBarSize={20}
               />
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
 
-        <div className="mt-2 flex items-center justify-between text-[11px] text-text-tertiary">
-          <span>
-            Opt: <span className="tabular-nums text-accent-primary">-10.44</span>
-          </span>
-          <span>
-            Iter: <span className="tabular-nums text-text-secondary">177</span> | <span className="tabular-nums text-text-secondary">150</span>
-          </span>
-        </div>
-      </Card>
+      <div className="mt-2 flex items-center justify-between text-[11px] text-text-tertiary">
+        <span>
+          Optimal: <span className="tabular-nums text-accent-primary">{data.optimal}</span>
+        </span>
+        <span>
+          Iterations: <span className="tabular-nums text-text-secondary">{data.iterations}</span>
+        </span>
+      </div>
     </div>
   );
 }
