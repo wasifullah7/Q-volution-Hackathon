@@ -9,8 +9,8 @@ export function Navigation() {
   const { theme, toggleTheme } = useTheme();
 
   const navLinks = [
-    { label: "Documentation", href: "#documentation" },
-    { label: "Accuracy/Technical Metrics", href: "#accuracy" },
+    { label: "Documentation", href: "/documentation" },
+    { label: "Accuracy/Technical Metrics", href: "/accuracy" },
     { label: "Creativity/Novelty", href: "#creativity" },
     { label: "Use of Rigetti Features", href: "#rigetti" },
   ];

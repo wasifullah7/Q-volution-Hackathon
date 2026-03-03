@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { HomePage, DashboardPage } from "@/pages";
+import { HomePage, DashboardPage, DocumentationPage, AccuracyPage } from "@/pages";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 export default function App() {
@@ -9,6 +9,8 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/documentation" element={<DocumentationPage />} />
+          <Route path="/accuracy" element={<AccuracyPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

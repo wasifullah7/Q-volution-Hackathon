@@ -1,30 +1,65 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import ForceGraph2D from "react-force-graph-2d";
 import { Badge } from "@/components/ui";
 import { CircuitBoard } from "lucide-react";
 import type { ParsedGraph, MaxCutSolution } from "@/lib/graph-parser";
 import { isCutEdge } from "@/lib/graph-parser";
 
-const COLORS = {
-  node: "#38BDF8",
-  nodeFill: "#0C4A6E",
-  nodeStroke: "#38BDF8",
-  edge: "rgba(56, 189, 248, 0.15)",
-  edgeWidth: 1,
-  hoverEdge: "rgba(56, 189, 248, 0.5)",
-  hoverEdgeWidth: 2,
-  partition0: "#38BDF8",
-  partition0Fill: "#0C4A6E",
-  partition1: "#A78BFA",
-  partition1Fill: "#4C1D95",
-  cutEdge: "#FBBF24",
-  cutEdgeWidth: 2.5,
-  nonCutEdge: "rgba(71, 85, 105, 0.2)",
-  nonCutEdgeWidth: 0.5,
-  label: "#F1F5F9",
-  labelDim: "#94A3B8",
-  bg: "#0B0F19",
-};
+function getCSSVar(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function useGraphColors() {
+  const read = useCallback(() => {
+    const accent = getCSSVar("--color-accent-primary");
+    const accentDim = getCSSVar("--color-accent-primary-dim");
+    const secondary = getCSSVar("--color-accent-secondary");
+    const secondaryDim = getCSSVar("--color-accent-secondary-dim");
+    const warning = getCSSVar("--color-warning");
+    const textPrimary = getCSSVar("--color-text-primary");
+    const textSecondary = getCSSVar("--color-text-secondary");
+    const textTertiary = getCSSVar("--color-text-tertiary");
+    const bg = getCSSVar("--color-bg-base");
+
+    return {
+      node: accent,
+      nodeFill: accentDim,
+      nodeStroke: accent,
+      edge: hexToRgba(accent, 0.15),
+      edgeWidth: 1,
+      hoverEdge: hexToRgba(accent, 0.5),
+      hoverEdgeWidth: 2,
+      partition0: accent,
+      partition0Fill: accentDim,
+      partition1: secondary,
+      partition1Fill: secondaryDim,
+      cutEdge: warning,
+      cutEdgeWidth: 2.5,
+      nonCutEdge: hexToRgba(textTertiary, 0.2),
+      nonCutEdgeWidth: 0.5,
+      label: textPrimary,
+      labelDim: textSecondary,
+      bg,
+    };
+  }, []);
+
+  const [colors, setColors] = useState(read);
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => setColors(read()));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, [read]);
+
+  return colors;
+}
 
 interface GraphVisualizationProps {
   graph: ParsedGraph;
@@ -53,6 +88,10 @@ function getLinkEndpointId(val: string | number | FGNode | undefined): string {
 }
 
 export function GraphVisualization({ graph, solution }: GraphVisualizationProps) {
+  const COLORS = useGraphColors();
+  const colorsRef = useRef(COLORS);
+  colorsRef.current = COLORS;
+
   const fgRef = useRef<any>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -128,6 +167,7 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
   };
 
   const nodeCanvasObject = (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    const C = colorsRef.current;
     const id = String(node.id ?? "");
     const label = (node.label as string) ?? id;
     const x = node.x ?? 0;
@@ -143,15 +183,15 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     if (hasSol) {
       const partition = sol!.get(id);
       if (partition === 1) {
-        fillColor = COLORS.partition1Fill;
-        strokeColor = COLORS.partition1;
+        fillColor = C.partition1Fill;
+        strokeColor = C.partition1;
       } else {
-        fillColor = COLORS.partition0Fill;
-        strokeColor = COLORS.partition0;
+        fillColor = C.partition0Fill;
+        strokeColor = C.partition0;
       }
     } else {
-      fillColor = COLORS.nodeFill;
-      strokeColor = COLORS.nodeStroke;
+      fillColor = C.nodeFill;
+      strokeColor = C.nodeStroke;
     }
 
     const radius = isHovered ? 8 : 6;
@@ -185,12 +225,13 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
       ctx.font = `${isHovered ? 600 : 500} ${fontSize}px "Inter", sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      ctx.fillStyle = isHovered ? COLORS.label : COLORS.labelDim;
+      ctx.fillStyle = isHovered ? C.label : C.labelDim;
       ctx.fillText(label, x, y + radius + 3);
     }
   };
 
   const linkColor = (link: FGLink) => {
+    const C = colorsRef.current;
     const sId = getLinkEndpointId(link.source);
     const tId = getLinkEndpointId(link.target);
     const hKey1 = `${sId}-${tId}`;
@@ -201,14 +242,15 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
 
     if (hasSol) {
       const cut = isCutEdge({ source: sId, target: tId }, sol!);
-      if (isHover) return cut ? COLORS.cutEdge : COLORS.hoverEdge;
-      return cut ? COLORS.cutEdge : COLORS.nonCutEdge;
+      if (isHover) return cut ? C.cutEdge : C.hoverEdge;
+      return cut ? C.cutEdge : C.nonCutEdge;
     }
 
-    return isHover ? COLORS.hoverEdge : COLORS.edge;
+    return isHover ? C.hoverEdge : C.edge;
   };
 
   const linkWidth = (link: FGLink) => {
+    const C = colorsRef.current;
     const sId = getLinkEndpointId(link.source);
     const tId = getLinkEndpointId(link.target);
     const hKey1 = `${sId}-${tId}`;
@@ -219,11 +261,11 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
 
     if (hasSol) {
       const cut = isCutEdge({ source: sId, target: tId }, sol!);
-      if (isHover) return cut ? 3.5 : COLORS.hoverEdgeWidth;
-      return cut ? COLORS.cutEdgeWidth : COLORS.nonCutEdgeWidth;
+      if (isHover) return cut ? 3.5 : C.hoverEdgeWidth;
+      return cut ? C.cutEdgeWidth : C.nonCutEdgeWidth;
     }
 
-    return isHover ? COLORS.hoverEdgeWidth : COLORS.edgeWidth;
+    return isHover ? C.hoverEdgeWidth : C.edgeWidth;
   };
 
   const cutEdgeCount = hasSolution

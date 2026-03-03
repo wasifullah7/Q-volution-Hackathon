@@ -11,7 +11,7 @@ import {
 
 export function HomePage() {
   return (
-    <div className="min-h-screen bg-[#060b16]">
+    <div className="min-h-screen bg-bg-base">
       <Navigation />
       <main>
         <HeroSection />

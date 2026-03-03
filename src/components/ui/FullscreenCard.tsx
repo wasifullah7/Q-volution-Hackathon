@@ -26,7 +26,7 @@ export function FullscreenCard({ children }: FullscreenCardProps) {
   }, []);
 
   return (
-    <div ref={containerRef} className="group relative h-full bg-bg-base">
+    <div ref={containerRef} className="group relative flex h-full flex-col bg-bg-base">
       {children}
       <button
         onClick={handleToggle}

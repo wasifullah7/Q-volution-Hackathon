@@ -126,6 +126,14 @@ html.light {
 }
 
 
+:fullscreen {
+  width: 100vw !important;
+  height: 100vh !important;
+}
+:fullscreen > * {
+  flex: 1;
+}
+
 .tabular-nums {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";

@@ -55,19 +55,19 @@ export function MeasurementResults({ data }: MeasurementResultsProps) {
         Rigetti QPU
       </div>
 
-      <div className="flex-1">
-        <div className="h-44 w-full">
+      <div className="flex flex-1 flex-col">
+        <div className="min-h-44 flex-1 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data.entries} barGap={2}>
               <CartesianGrid
                 strokeDasharray="3 3"
-                stroke="#2A3450"
+                stroke="var(--color-border-subtle)"
                 vertical={false}
               />
               <XAxis
                 dataKey="bitstring"
-                tick={{ fontSize: 9, fill: "#94A3B8", fontFamily: "JetBrains Mono, monospace" }}
-                axisLine={{ stroke: "#2A3450" }}
+                tick={{ fontSize: 9, fill: "var(--color-text-secondary)", fontFamily: "JetBrains Mono, monospace" }}
+                axisLine={{ stroke: "var(--color-border-subtle)" }}
                 tickLine={false}
                 angle={-45}
                 textAnchor="end"
@@ -75,7 +75,7 @@ export function MeasurementResults({ data }: MeasurementResultsProps) {
                 interval={0}
               />
               <YAxis
-                tick={{ fontSize: 10, fill: "#94A3B8" }}
+                tick={{ fontSize: 10, fill: "var(--color-text-secondary)" }}
                 axisLine={false}
                 tickLine={false}
                 width={30}
@@ -84,7 +84,7 @@ export function MeasurementResults({ data }: MeasurementResultsProps) {
               <Bar
                 dataKey="count"
                 name="Rigetti QPU"
-                fill="#38BDF8"
+                fill="var(--color-accent-primary)"
                 radius={[2, 2, 0, 0]}
                 maxBarSize={20}
               />

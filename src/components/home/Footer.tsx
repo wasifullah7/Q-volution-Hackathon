@@ -48,7 +48,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="border-t border-white/[0.06] bg-[#060b16] py-12 lg:py-16">
+    <footer className="border-t border-border-subtle bg-bg-base py-12 lg:py-16">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-6 lg:gap-12">
           {/* Logo Column */}
@@ -56,7 +56,7 @@ export function Footer() {
             <Link to="/" className="mb-5 inline-block">
               <Logo size="md" />
             </Link>
-            <p className="mb-6 text-[13px] leading-[1.6] text-gray-500 max-w-[260px]">
+            <p className="mb-6 text-[13px] leading-[1.6] text-text-tertiary max-w-[260px]">
               Quantum Optimization for Energy Grid Resilience
             </p>
             <div className="flex gap-3">
@@ -64,7 +64,7 @@ export function Footer() {
                 <a
                   key={social.name}
                   href={social.href}
-                  className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 text-gray-500 transition-colors hover:text-[#00d4ff] hover:border-[#00d4ff]/30"
+                  className="flex h-8 w-8 items-center justify-center rounded-full border border-border-subtle text-text-tertiary transition-colors hover:text-accent-primary hover:border-accent-primary/30"
                   aria-label={social.name}
                 >
                   {social.icon}
@@ -76,7 +76,7 @@ export function Footer() {
           {/* Link Columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.05em] text-gray-400">
+              <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-secondary">
                 {category}
               </h4>
               <ul className="space-y-2">
@@ -84,7 +84,7 @@ export function Footer() {
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-[13px] text-gray-500 transition-colors hover:text-[#00d4ff]"
+                      className="text-[13px] text-text-tertiary transition-colors hover:text-accent-primary"
                     >
                       {link}
                     </a>
@@ -96,18 +96,18 @@ export function Footer() {
         </div>
 
         {/* Bottom Row */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/[0.06] pt-8 md:flex-row">
-          <p className="text-[12px] text-gray-600">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border-subtle pt-8 md:flex-row">
+          <p className="text-[12px] text-text-tertiary">
             &copy; 2025 - Ele-Q-tric
           </p>
           <div className="flex items-center gap-6">
-            <a href="#" className="text-[12px] text-gray-600 transition-colors hover:text-[#00d4ff]">
+            <a href="#" className="text-[12px] text-text-tertiary transition-colors hover:text-accent-primary">
               Privacy Policy
             </a>
-            <a href="#" className="text-[12px] text-gray-600 transition-colors hover:text-[#00d4ff]">
+            <a href="#" className="text-[12px] text-text-tertiary transition-colors hover:text-accent-primary">
               Terms &amp; Conditions
             </a>
-            <a href="#" className="text-[12px] text-gray-600 transition-colors hover:text-[#00d4ff]">
+            <a href="#" className="text-[12px] text-text-tertiary transition-colors hover:text-accent-primary">
               Legal Notice
             </a>
           </div>

@@ -41,7 +41,7 @@ export function StateDistribution({ data }: StateDistributionProps) {
       </div>
 
       <div className="flex flex-1 items-center justify-center">
-        <div className="h-52 w-52">
+        <div className="aspect-square w-full max-w-52">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
