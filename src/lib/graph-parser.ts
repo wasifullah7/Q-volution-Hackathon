@@ -14,12 +14,8 @@ export interface ParsedGraph {
   links: GraphLink[];
 }
 
-/** Max-Cut solution: maps node id -> partition (0 or 1) */
 export type MaxCutSolution = Map<string, 0 | 1>;
 
-/**
- * Determine if a link is a "cut" edge (endpoints in different partitions).
- */
 export function isCutEdge(
   link: { source: string; target: string },
   solution: MaxCutSolution
@@ -30,9 +26,6 @@ export function isCutEdge(
   return sp !== tp;
 }
 
-/**
- * Count cut edges for a given solution.
- */
 export function countCutEdges(
   links: GraphLink[],
   solution: MaxCutSolution
@@ -40,11 +33,7 @@ export function countCutEdges(
   return links.filter((l) => isCutEdge(l, solution)).length;
 }
 
-/**
- * Simulate a Max-Cut solution (mock QAOA result).
- * Assigns each node to partition 0 or 1 using a greedy heuristic
- * to produce a plausible-looking cut.
- */
+
 export function simulateMaxCutSolution(graph: ParsedGraph): MaxCutSolution {
   const solution: MaxCutSolution = new Map();
   const adj = new Map<string, string[]>();
@@ -57,7 +46,6 @@ export function simulateMaxCutSolution(graph: ParsedGraph): MaxCutSolution {
     adj.get(link.target)?.push(link.source);
   }
 
-  // Greedy assignment: for each node, pick the partition that maximizes cut edges
   for (const node of graph.nodes) {
     const neighbors = adj.get(node.id) ?? [];
     let count0 = 0;
@@ -69,14 +57,12 @@ export function simulateMaxCutSolution(graph: ParsedGraph): MaxCutSolution {
       else if (np === 1) count1++;
     }
 
-    // Put in the partition opposite to the majority of already-assigned neighbors
     solution.set(node.id, count0 >= count1 ? 1 : 0);
   }
 
   return solution;
 }
 
-// ---- File Parsers ----
 
 function parseGML(content: string): ParsedGraph {
   const nodes: GraphNode[] = [];
@@ -171,7 +157,6 @@ export function parseGraphFile(content: string, filename: string): ParsedGraph {
     try {
       return parseJSON(content);
     } catch {
-      // fall through
     }
   }
 

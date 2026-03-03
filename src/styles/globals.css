@@ -1,69 +1,54 @@
 @import "tailwindcss";
 
-/* ========================================
-   Quantum Dash -- Design System Tokens
-   Theme: "Quantum Depth"
-   ======================================== */
 
 @theme {
-  /* ---- Backgrounds & Surfaces ---- */
   --color-bg-base: #0B0F19;
   --color-bg-surface-1: #111827;
   --color-bg-surface-2: #1A2035;
   --color-bg-surface-3: #232B3E;
 
-  /* ---- Borders ---- */
   --color-border-subtle: #2A3450;
   --color-border-default: #374463;
 
-  /* ---- Primary Accent (Sky Cyan) ---- */
   --color-accent-primary: #38BDF8;
   --color-accent-primary-hover: #7DD3FC;
   --color-accent-primary-dim: #0C4A6E;
 
-  /* ---- Secondary Accent (Quantum Violet) ---- */
   --color-accent-secondary: #A78BFA;
   --color-accent-secondary-hover: #C4B5FD;
   --color-accent-secondary-dim: #4C1D95;
 
-  /* ---- Data Visualization ---- */
   --color-data-1: #38BDF8;
   --color-data-2: #A78BFA;
   --color-data-3: #34D399;
   --color-data-4: #FB923C;
   --color-data-5: #F472B6;
 
-  /* ---- Semantic ---- */
   --color-success: #34D399;
   --color-warning: #FBBF24;
   --color-error: #F87171;
   --color-info: #38BDF8;
 
-  /* ---- Text ---- */
   --color-text-primary: #F1F5F9;
   --color-text-secondary: #94A3B8;
   --color-text-tertiary: #475569;
   --color-text-disabled: #334155;
 
-  /* ---- Typography ---- */
   --font-display: "Space Grotesk", sans-serif;
   --font-body: "Inter", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 
-  /* ---- Glow Shadows ---- */
   --shadow-glow-primary: 0 0 20px rgba(56, 189, 248, 0.15);
   --shadow-glow-secondary: 0 0 20px rgba(167, 139, 250, 0.15);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
 
-  /* ---- Radii ---- */
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
 }
 
-/* ---- Base Styles ---- */
 
 *,
 *::before,
@@ -84,7 +69,6 @@ body {
   line-height: 1.5;
 }
 
-/* ---- Scrollbar ---- */
 
 ::-webkit-scrollbar {
   width: 6px;
@@ -104,7 +88,6 @@ body {
   background: var(--color-text-tertiary);
 }
 
-/* ---- Tabular Nums for Data ---- */
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;

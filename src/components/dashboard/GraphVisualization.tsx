@@ -12,7 +12,6 @@ import {
 import type { ParsedGraph, MaxCutSolution } from "@/lib/graph-parser";
 import { isCutEdge } from "@/lib/graph-parser";
 
-// ── Theme Colors ──────────────────────────────────────────
 const COLORS = {
   node: "#38BDF8",
   nodeFill: "#0C4A6E",
@@ -34,7 +33,6 @@ const COLORS = {
   bg: "#0B0F19",
 };
 
-// ── Types ─────────────────────────────────────────────────
 interface GraphVisualizationProps {
   graph: ParsedGraph;
   solution: MaxCutSolution | null;
@@ -55,7 +53,6 @@ interface FGLink {
   [key: string]: unknown;
 }
 
-// ── Toolbar Button ────────────────────────────────────────
 function ToolbarButton({
   onClick,
   title,
@@ -82,27 +79,22 @@ function getLinkEndpointId(val: string | number | FGNode | undefined): string {
   return String(val);
 }
 
-// ── Component ─────────────────────────────────────────────
 export function GraphVisualization({ graph, solution }: GraphVisualizationProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fgRef = useRef<any>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Use refs for hover state so callbacks don't trigger re-renders
   const hoveredNodeRef = useRef<FGNode | null>(null);
   const highlightNodesRef = useRef<Set<string | number>>(new Set());
   const highlightLinksRef = useRef<Set<string>>(new Set());
   const [hoveredNodeDisplay, setHoveredNodeDisplay] = useState<FGNode | null>(null);
 
-  // Stable refs for solution data (avoids callback re-creation)
   const solutionRef = useRef<MaxCutSolution | null>(null);
   solutionRef.current = solution;
 
   const hasSolution = solution !== null && solution.size > 0;
 
-  // Build neighbor map
   const neighborMap = useRef<Map<string | number, Set<string | number>>>(new Map());
   useEffect(() => {
     const map = new Map<string | number, Set<string | number>>();
@@ -114,7 +106,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     neighborMap.current = map;
   }, [graph]);
 
-  // ── Memoize graphData so it only changes when graph prop changes ──
   const graphData = useMemo(
     () => ({
       nodes: graph.nodes.map((n) => ({ ...n })),
@@ -123,7 +114,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     [graph]
   );
 
-  // ── Resize observer ──
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -137,7 +127,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     return () => observer.disconnect();
   }, []);
 
-  // ── Fit to view on graph change (NO pauseAnimation -- that kills the render loop) ──
   useEffect(() => {
     const timer = setTimeout(() => {
       fgRef.current?.zoomToFit(400, 60);
@@ -145,7 +134,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     return () => clearTimeout(timer);
   }, [graph]);
 
-  // ── Node hover -- mutate refs, only setState for the tooltip display ──
   const handleNodeHover = (node: FGNode | null) => {
     hoveredNodeRef.current = node;
     const hNodes = new Set<string | number>();
@@ -167,7 +155,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     setHoveredNodeDisplay(node);
   };
 
-  // ── Toolbar handlers ──
   const handleZoomIn = () => {
     const current = fgRef.current?.zoom() ?? 1;
     fgRef.current?.zoom(current * 1.4, 300);
@@ -195,7 +182,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
 
-  // ── Node renderer (reads refs directly -- no React state deps that cause re-creation) ──
   const nodeCanvasObject = (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const id = String(node.id ?? "");
     const label = (node.label as string) ?? id;
@@ -225,7 +211,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
 
     const radius = isHovered ? 8 : 6;
 
-    // Glow on hover
     if (isHovered || isNeighborHighlighted) {
       ctx.save();
       ctx.shadowColor = strokeColor;
@@ -237,7 +222,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
       ctx.restore();
     }
 
-    // Filled circle
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fillStyle = fillColor;
@@ -246,13 +230,11 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     ctx.lineWidth = isHovered ? 2.5 : 1.5;
     ctx.stroke();
 
-    // Center dot
     ctx.beginPath();
     ctx.arc(x, y, 2, 0, Math.PI * 2);
     ctx.fillStyle = strokeColor;
     ctx.fill();
 
-    // Label
     if (globalScale > 1.5 || isHovered) {
       const fontSize = Math.max(10 / globalScale, 3.5);
       ctx.font = `${isHovered ? 600 : 500} ${fontSize}px "Inter", sans-serif`;
@@ -263,7 +245,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     }
   };
 
-  // ── Link color (reads refs directly) ──
   const linkColor = (link: FGLink) => {
     const sId = getLinkEndpointId(link.source);
     const tId = getLinkEndpointId(link.target);
@@ -282,7 +263,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     return isHover ? COLORS.hoverEdge : COLORS.edge;
   };
 
-  // ── Link width (reads refs directly) ──
   const linkWidth = (link: FGLink) => {
     const sId = getLinkEndpointId(link.source);
     const tId = getLinkEndpointId(link.target);
@@ -301,7 +281,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     return isHover ? COLORS.hoverEdgeWidth : COLORS.edgeWidth;
   };
 
-  // Pre-compute cut count for badge
   const cutEdgeCount = hasSolution
     ? graph.links.filter((l) => isCutEdge(l, solution!)).length
     : 0;
@@ -340,7 +319,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
         maxZoom={15}
       />
 
-      {/* ── Stats overlay ── */}
       <div className="absolute left-3 top-3 flex items-center gap-2">
         <Badge variant="primary">Nodes: {graph.nodes.length}</Badge>
         <Badge variant="secondary">Edges: {graph.links.length}</Badge>
@@ -351,7 +329,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
         )}
       </div>
 
-      {/* ── Legend (only when solution is active) ── */}
       {hasSolution && (
         <div className="absolute bottom-3 left-3 rounded-lg border border-border-subtle bg-bg-surface-1/90 px-3 py-2 backdrop-blur-sm">
           <p className="mb-1.5 font-display text-[10px] font-semibold uppercase tracking-wider text-text-secondary">
@@ -378,7 +355,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
         </div>
       )}
 
-      {/* ── Hovered node info ── */}
       {hoveredNodeDisplay && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg border border-border-subtle bg-bg-surface-1/90 px-3 py-2 backdrop-blur-sm">
           <div className="flex items-center gap-3">
@@ -397,7 +373,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
         </div>
       )}
 
-      {/* ── Toolbar ── */}
       <div className="absolute right-3 top-3 flex flex-col gap-1.5 rounded-lg border border-border-subtle bg-bg-surface-1/90 p-1.5 backdrop-blur-sm">
         <ToolbarButton onClick={handleZoomIn} title="Zoom In">
           <ZoomIn className="h-4 w-4" />
@@ -421,7 +396,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
         </ToolbarButton>
       </div>
 
-      {/* ── Keyboard hints ── */}
       <div className="absolute bottom-3 right-3 flex items-center gap-2 text-[10px] text-text-tertiary">
         <span>Scroll: zoom</span>
         <span>Drag bg: pan</span>
