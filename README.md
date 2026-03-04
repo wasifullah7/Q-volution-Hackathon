@@ -24,7 +24,7 @@
 
 ## The Hackathon
 
-**Q-Volution** by [Girls in Quantum](https://www.girlsinquantum.com/) — **Track A: Energy Grid Optimization**.
+**Q-Volution** by [Girls in Quantum](https://www.girlsinquantum.com/) : **Track A: Energy Grid Optimization**.
 
 The challenge: optimize the *power number*, a key robustness metric for electricity distribution networks, using quantum computing on real Rigetti hardware.
 
@@ -40,15 +40,15 @@ In South Carolina, there was an average of **53 hours of blackouts** in 2024  ne
 
 ## Our Solution
 
-Ele(Q)tric introduces **Quantum Preconditioning via Graph Decomposition** — a novel approach that makes QAOA practical for real-world power grid optimization.
+Ele(Q)tric introduces **Quantum Preconditioning via Graph Decomposition** : a novel approach that makes QAOA practical for real-world power grid optimization.
 
 ### Key Innovations
 
-- **Light-Cone Decomposition** — Partition large graphs into tractable subgraphs that fit within quantum hardware constraints
-- **Preconditioned QAOA** — Use decomposition results to warm-start the quantum optimizer, achieving 10x speedup
-- **Warm-Started QAOA** — Initialize with simulated annealing ansatz for Problem B
-- **Parameter Transferability** — Train on frequent subgraph patterns, apply across the full graph
-- **Sustainability Metrics** — Calculated efficiency and sustainability factors for energy partitions
+- **Light-Cone Decomposition** : Partition large graphs into tractable subgraphs that fit within quantum hardware constraints
+- **Preconditioned QAOA** : Use decomposition results to warm-start the quantum optimizer, achieving 10x speedup
+- **Warm-Started QAOA** : Initialize with simulated annealing ansatz for Problem B
+- **Parameter Transferability** : Train on frequent subgraph patterns, apply across the full graph
+- **Sustainability Metrics** : Calculated efficiency and sustainability factors for energy partitions
 
 ### Results (South Carolina Grid)
 
@@ -85,15 +85,15 @@ The dashboard is a fully interactive prototype that visualizes QAOA execution on
 
 ### Features
 
-- **Quantum Circuit Visualizer** — Force-directed graph with Max-Cut solution overlay, color-coded partitions, highlighted cut edges, interactive hover
-- **Measurement Results** — Bar chart of bitstring measurement outcomes from QPU execution
-- **State Distribution** — Donut chart showing quantum state probability distribution
-- **Sustainability Scorecard** — Energy savings, carbon avoided, EPA alignment metrics
-- **Graph Upload** — Drag-and-drop support for `.gml`, `.json`, `.csv`, `.txt`, `.tsv`, `.edgelist` formats
-- **Backend Selection** — Choose between Rigetti QPU, Qiskit Simulator, or Compare Both
-- **AI Analysis Chat** — Ask questions about QAOA results, convergence, gate counts, and generate PDF reports
-- **Dark/Light Theme** — Full theme system with CSS variables
-- **Fullscreen Mode** — Expand any card to fullscreen for detailed inspection
+- **Quantum Circuit Visualizer** : Force-directed graph with Max-Cut solution overlay, color-coded partitions, highlighted cut edges, interactive hover
+- **Measurement Results** : Bar chart of bitstring measurement outcomes from QPU execution
+- **State Distribution** : Donut chart showing quantum state probability distribution
+- **Sustainability Scorecard** : Energy savings, carbon avoided, EPA alignment metrics
+- **Graph Upload** : Drag-and-drop support for `.gml`, `.json`, `.csv`, `.txt`, `.tsv`, `.edgelist` formats
+- **Backend Selection** : Choose between Rigetti QPU, Qiskit Simulator, or Compare Both
+- **AI Analysis Chat** : Ask questions about QAOA results, convergence, gate counts, and generate PDF reports
+- **Dark/Light Theme** : Full theme system with CSS variables
+- **Fullscreen Mode** : Expand any card to fullscreen for detailed inspection
 
 <p align="center">
   <img src="public/aqoragraph.png" alt="QAOA Graph Visualization" width="400" />
