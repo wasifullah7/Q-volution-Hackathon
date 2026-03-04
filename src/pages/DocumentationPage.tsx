@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 
 export function DocumentationPage() {
   return (
@@ -37,15 +36,17 @@ export function DocumentationPage() {
               <p className="mx-auto mb-8 max-w-[560px] text-[14px] leading-relaxed text-text-secondary">
                 Scaling Maximum Power Energy Section with QAOA (Quantum Approximate Optimization Algorithm) and Quantum Preconditioning.
               </p>
-              <Link
-                to="/https://drive.google.com/file/d/1sAVb8GB12dp2r3oRjXwcAULWIey9NXEJ/view?usp=sharing"
+              <a
+                href="https://drive.google.com/file/d/1sAVb8GB12dp2r3oRjXwcAULWIey9NXEJ/view?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-accent-primary px-8 py-3 text-[14px] font-bold text-bg-base transition-all hover:opacity-90 hover:scale-[1.02] shadow-glow-primary"
               >
                 Try the Prototype
                 <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none">
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-              </Link>
+              </a>
             </div>
           </div>
         </div>
