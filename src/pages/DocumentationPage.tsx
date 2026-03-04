@@ -38,7 +38,7 @@ export function DocumentationPage() {
                 Scaling Maximum Power Energy Section with QAOA (Quantum Approximate Optimization Algorithm) and Quantum Preconditioning.
               </p>
               <Link
-                to="/dashboard"
+                to="/https://drive.google.com/file/d/1sAVb8GB12dp2r3oRjXwcAULWIey9NXEJ/view?usp=sharing"
                 className="inline-flex items-center gap-2 rounded-full bg-accent-primary px-8 py-3 text-[14px] font-bold text-bg-base transition-all hover:opacity-90 hover:scale-[1.02] shadow-glow-primary"
               >
                 Try the Prototype
