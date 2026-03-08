@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui";
-import { Zap, Home, LayoutDashboard } from "lucide-react";
+import { Home, LayoutDashboard } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export function Header() {

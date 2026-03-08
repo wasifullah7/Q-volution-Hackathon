@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import ForceGraph2D from "react-force-graph-2d";
-import { Badge } from "@/components/ui";
 import { CircuitBoard } from "lucide-react";
 import type { ParsedGraph, MaxCutSolution } from "@/lib/graph-parser";
 import { isCutEdge } from "@/lib/graph-parser";
@@ -99,12 +98,10 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
   const hoveredNodeRef = useRef<FGNode | null>(null);
   const highlightNodesRef = useRef<Set<string | number>>(new Set());
   const highlightLinksRef = useRef<Set<string>>(new Set());
-  const [hoveredNodeDisplay, setHoveredNodeDisplay] = useState<FGNode | null>(null);
+  const [, setHoveredNodeDisplay] = useState<FGNode | null>(null);
 
   const solutionRef = useRef<MaxCutSolution | null>(null);
   solutionRef.current = solution;
-
-  const hasSolution = solution !== null && solution.size > 0;
 
   const neighborMap = useRef<Map<string | number, Set<string | number>>>(new Map());
   useEffect(() => {
@@ -166,7 +163,7 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     setHoveredNodeDisplay(node);
   };
 
-  const nodeCanvasObject = (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
+  const nodeCanvasObject = (node: FGNode, ctx: CanvasRenderingContext2D, _globalScale: number) => {
     const COLORS = colorsRef.current;
     const id = String(node.id ?? "");
     const label = (node.label as string) ?? id;
@@ -232,10 +229,6 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     }
     return 1;
   };
-
-  const cutEdgeCount = hasSolution
-    ? graph.links.filter((l) => isCutEdge(l, solution!)).length
-    : 0;
 
   return (
     <div className="flex h-full flex-col rounded-lg border border-border-subtle bg-bg-surface-1 transition-colors duration-300">
