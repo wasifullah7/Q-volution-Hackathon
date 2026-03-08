@@ -10,9 +10,11 @@ export function Header() {
     <header className="flex h-16 items-center justify-between border-b border-border-subtle bg-bg-surface-1 px-6">
       <div className="flex items-center gap-8">
         <Link to="/" className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent-primary to-accent-secondary">
-            <Zap className="h-5 w-5 text-white" />
-          </div>
+          <img
+            src="/logo.png"
+            alt="EleQtric"
+            className="h-10 w-10 object-contain rounded-xl"
+          />
           <div className="flex flex-col">
             <h1 className="font-display text-lg font-bold tracking-tight text-text-primary">
               Ele(Q)tric

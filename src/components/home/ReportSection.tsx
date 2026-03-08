@@ -28,22 +28,74 @@ export function ReportSection() {
               </div>
 
               <div className="pl-6">
-                <h3 className="mb-2 text-[15px] font-bold tracking-tight text-text-primary">Team Members</h3>
-                <ul className="space-y-1 text-[13px] leading-[1.6] text-text-secondary">
-                  <li>Saif Ullah</li>
-                  <li>Ifrah</li>
-                  <li>Rafia</li>
-                  <li>Wasif ullah</li>
-                  <li>Kiara S.A.M. Tahir</li>
-                </ul>
-              </div>
+  <h3 className="mb-2 text-[15px] font-bold tracking-tight text-text-primary">
+    Team Members
+  </h3>
+
+  <ul className="space-y-1 text-[13px] leading-[1.6] text-text-secondary">
+    <li>
+      <a
+        href="https://www.linkedin.com/in/maliksaifullah-wali"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:underline"
+      >
+        Malik Saif Ullah
+      </a>
+    </li>
+
+    <li>
+      <a
+        href="https://www.linkedin.com/in/rafimr"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:underline"
+      >
+        Rafia German
+      </a>
+    </li>
+
+    <li>
+      <a
+        href="https://www.linkedin.com/in/wasifullahdev/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:underline"
+      >
+        Wasif Ullah
+      </a>
+    </li>
+
+    <li>
+      <a
+        href="https://www.linkedin.com/in/klasiktaidi/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:underline"
+      >
+        Klasik S.K.M. Taidi
+      </a>
+    </li>
+    <li>
+      <a
+        href=""
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:underline"
+      >
+        Hussein
+      </a>
+    </li>
+  </ul>
+</div>
+
             </div>
 
-            <div className="relative flex justify-center">
+            <div className="relative flex justify-center lg:items-center">
               <img
                 src="/regiti.png"
                 alt="Q-Hackathon Track A: Energy Grid Optimization - Rigetti"
-                className="w-full h-auto block opacity-90 transition-opacity hover:opacity-100 rounded-lg"
+                className="w-full max-w-[500px] h-auto block opacity-90 transition-opacity hover:opacity-100 rounded-lg"
               />
             </div>
           </div>
