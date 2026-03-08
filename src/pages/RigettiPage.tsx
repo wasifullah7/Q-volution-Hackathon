@@ -1,7 +1,6 @@
 export function RigettiPage() {
   return (
     <>
-      {/* Salient Features Section */}
       <section className="bg-bg-base pt-28 pb-16 lg:pb-24">
         <div className="mx-auto max-w-[600px] px-6">
           <h1 className="mb-12 text-center text-[36px] font-bold leading-[1.1] tracking-[-0.03em] text-text-primary sm:text-[44px]">
@@ -33,7 +32,6 @@ export function RigettiPage() {
         </div>
       </section>
 
-      {/* Partitioned Graph Section */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[800px] px-6">
           <h2 className="mb-10 text-[22px] font-bold leading-[1.3] text-text-primary sm:text-[26px]">
@@ -47,7 +45,6 @@ export function RigettiPage() {
         </div>
       </section>
 
-      {/* Resource Estimation Section */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[800px] px-6">
           <h2 className="mb-10 text-[22px] font-bold leading-[1.3] text-text-primary sm:text-[26px]">

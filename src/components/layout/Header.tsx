@@ -9,7 +9,6 @@ export function Header() {
   return (
     <header className="flex h-16 items-center justify-between border-b border-border-subtle bg-bg-surface-1 px-6">
       <div className="flex items-center gap-8">
-        {/* Logo */}
         <Link to="/" className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-accent-primary to-accent-secondary">
             <Zap className="h-5 w-5 text-white" />
@@ -24,26 +23,23 @@ export function Header() {
           </div>
         </Link>
 
-        {/* Navigation */}
         <nav className="hidden items-center gap-1 sm:flex">
           <Link
             to="/"
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              !isDashboard
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${!isDashboard
                 ? "bg-accent-primary-dim/50 text-accent-primary"
                 : "text-text-secondary hover:bg-bg-surface-2 hover:text-text-primary"
-            }`}
+              }`}
           >
             <Home className="h-4 w-4" />
             Home
           </Link>
           <Link
             to="/dashboard"
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              isDashboard
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isDashboard
                 ? "bg-accent-primary-dim/50 text-accent-primary"
                 : "text-text-secondary hover:bg-bg-surface-2 hover:text-text-primary"
-            }`}
+              }`}
           >
             <LayoutDashboard className="h-4 w-4" />
             Dashboard

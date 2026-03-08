@@ -1,7 +1,6 @@
 export function CreativityPage() {
   return (
     <>
-      {/* Rigetti Resources Section */}
       <section className="bg-bg-base pt-28 pb-16 lg:pb-24">
         <div className="mx-auto max-w-[800px] px-6">
           <div className="mb-3 text-[12px] font-semibold tracking-wide text-accent-primary">
@@ -27,7 +26,6 @@ export function CreativityPage() {
         </div>
       </section>
 
-      {/* Terminal Screenshots Section */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[800px] space-y-10 px-6">
           <img

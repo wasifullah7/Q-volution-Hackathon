@@ -2,10 +2,12 @@ import { CardTitle, Button, Select } from "@/components/ui";
 import { Play, FileText, X, RotateCcw, Leaf, Loader2 } from "lucide-react";
 import { useState, useRef, useCallback, type DragEvent } from "react";
 
-const BACKENDS = [
-  { value: "rigetti", label: "Rigetti QPU" },
-  { value: "qiskit", label: "Qiskit Simulator" },
-  { value: "both", label: "Compare Both" },
+const ALGORITHMS = [
+  { value: "gs_stp", label: "GS STP (On Classical Comp)" },
+  { value: "simulated_annealing", label: "Simulated Annealing" },
+  { value: "precond_qaoa_qvb", label: "Preconditioned QAOA (on QVB)" },
+  { value: "precond_qaoa_rigetti", label: "Preconditioned QAOA (on Rigetti Ankaa 3)" },
+  { value: "compare_all", label: "Compare All" },
 ];
 
 const LAYERS = [1, 2, 3, 4];
@@ -132,12 +134,12 @@ export function ProjectConfig({
         )}
       </div>
 
-      {/* Backend */}
+      {/* Algorithms */}
       <div className="space-y-2">
         <label className="font-body text-xs font-medium uppercase tracking-wider text-text-secondary">
-          Backend
+          Select The Algorithms
         </label>
-        <Select options={BACKENDS} defaultValue="rigetti" />
+        <Select options={ALGORITHMS} defaultValue="precond_qaoa_rigetti" />
       </div>
 
       {/* QAOA Layers */}

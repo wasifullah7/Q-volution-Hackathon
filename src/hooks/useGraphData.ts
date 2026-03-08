@@ -16,12 +16,10 @@ export function useGraphData() {
   const [solution, setSolution] = useState<MaxCutSolution | null>(null);
   const [cutCount, setCutCount] = useState(0);
 
-  // File upload shows a dummy graph regardless of file content
   const loadFile = useCallback((file: File) => {
     setError(null);
     setSolution(null);
     setCutCount(0);
-    // Show a fresh dummy graph instead of parsing the actual file
     setGraph(generateDemoGraph(25, 0.25));
     setFilename(file.name);
   }, []);

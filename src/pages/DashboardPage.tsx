@@ -6,7 +6,7 @@ import {
   MeasurementResults,
   TechnicalMetrics,
   AIAnalysis,
-  SustainabilityScorecard,
+  ProbabilityOfResults,
   StateDistribution,
 } from "@/components/dashboard";
 import { FullscreenCard } from "@/components/ui/FullscreenCard";
@@ -112,29 +112,29 @@ export function DashboardPage() {
 
           {/* Top Left - Quantum Circuit Visualizer */}
           <FullscreenCard>
-            <div id="chart-graph" className="flex flex-1 flex-col">
+            <div id="chart-graph" className="flex h-full w-full flex-col overflow-hidden">
               <GraphVisualization graph={graph} solution={solution} />
             </div>
           </FullscreenCard>
 
-          {/* Top Right - Sustainability Scorecard */}
+          {/* Top Right - Probability of Results */}
           <FullscreenCard>
-            <div id="chart-sustainability" className="flex flex-1 flex-col">
-              <SustainabilityScorecard />
+            <div id="chart-sustainability" className="flex h-full w-full flex-col overflow-hidden">
+              <ProbabilityOfResults />
             </div>
           </FullscreenCard>
 
           {/* Bottom Left - State Distribution */}
           <FullscreenCard>
-            <div id="chart-distribution" className="flex flex-1 flex-col">
-              <StateDistribution data={simData.stateDistribution} />
+            <div id="chart-distribution" className="flex h-full w-full flex-col overflow-hidden">
+              <StateDistribution />
             </div>
           </FullscreenCard>
 
           {/* Bottom Right - Measurement Results */}
           <FullscreenCard>
-            <div id="chart-measurements" className="flex flex-1 flex-col">
-              <MeasurementResults data={simData.measurements} />
+            <div id="chart-measurements" className="flex h-full w-full flex-col overflow-hidden">
+              <MeasurementResults />
             </div>
           </FullscreenCard>
         </div>

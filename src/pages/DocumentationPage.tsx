@@ -2,16 +2,13 @@
 export function DocumentationPage() {
   return (
     <>
-      {/* Documentation Hero */}
       <section className="relative overflow-hidden bg-bg-base pt-28 pb-20">
-        {/* Right side gradient accent */}
         <div className="pointer-events-none absolute right-0 top-0 h-full w-[6px]">
           <div className="h-full w-full bg-gradient-to-b from-accent-primary via-accent-secondary to-data-4" />
         </div>
 
         <div className="mx-auto max-w-[1000px] px-6 lg:px-0">
           <div className="relative overflow-hidden rounded-xl border border-border-subtle bg-bg-surface-1/60 px-8 py-16 text-center shadow-2xl">
-            {/* Grid Background */}
             <div
               className="absolute inset-0 opacity-[0.03]"
               style={{
@@ -23,7 +20,6 @@ export function DocumentationPage() {
               }}
             />
 
-            {/* Glow Effects */}
             <div className="absolute left-0 top-0 h-[200px] w-[300px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-primary/[0.1] blur-[60px]" />
             <div className="absolute right-0 top-0 h-[200px] w-[300px] translate-x-1/2 -translate-y-1/2 rounded-full bg-accent-secondary/[0.08] blur-[60px]" />
 
@@ -52,7 +48,6 @@ export function DocumentationPage() {
         </div>
       </section>
 
-      {/* Problem B Section */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[1000px] px-6 lg:px-0">
           <div className="mb-3 text-[12px] font-semibold text-accent-primary">
@@ -75,7 +70,6 @@ export function DocumentationPage() {
         </div>
       </section>
 
-      {/* Problem A Section */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[1000px] px-6 lg:px-0">
           <div className="mb-3 text-[12px] font-semibold text-accent-primary">
@@ -98,7 +92,6 @@ export function DocumentationPage() {
         </div>
       </section>
 
-      {/* Key Learnings Section */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[1000px] px-6 lg:px-0">
           <div className="mb-3 text-[12px] font-semibold text-accent-primary">

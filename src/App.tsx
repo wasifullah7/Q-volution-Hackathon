@@ -8,7 +8,6 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <Routes>
-          {/* Pages with shared Navigation + CTA + Contact + Footer */}
           <Route element={<SiteLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/documentation" element={<DocumentationPage />} />
@@ -17,7 +16,6 @@ export default function App() {
             <Route path="/rigetti" element={<RigettiPage />} />
           </Route>
 
-          {/* Dashboard has its own layout */}
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

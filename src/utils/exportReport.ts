@@ -27,7 +27,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
   const margin = 16;
   const contentW = pageW - margin * 2;
 
-  // ── Colors ──
   const bgDark = "#0B0F19";
   const bgCard = "#111827";
   const cyan = "#38BDF8";
@@ -35,7 +34,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
   const gray = "#94A3B8";
   const darkGray = "#475569";
 
-  // ── Helper Functions ──
   function drawBackground() {
     pdf.setFillColor(bgDark);
     pdf.rect(0, 0, pageW, pageH, "F");
@@ -62,26 +60,19 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
     const valW = pdf.getTextWidth(value);
     drawText(value, x + (w - valW) / 2, y + h / 2 - 1, 20, cyan, "bold");
     drawText(label, x + w / 2, y + h / 2 + 8, 8, gray, "normal");
-    // center label
     pdf.setFontSize(8);
     const lblW = pdf.getTextWidth(label);
     pdf.text(label, x + (w - lblW) / 2, y + h / 2 + 8);
   }
 
-  // ════════════════════════════════════════
-  // PAGE 1 — Cover + Summary
-  // ════════════════════════════════════════
   drawBackground();
 
-  // Accent bar at top
   pdf.setFillColor(cyan);
   pdf.rect(0, 0, pageW, 1.5, "F");
 
-  // Title
   drawText("QAOA Simulation Report", margin, 32, 26, white, "bold");
   drawText("Ele-Q-tric  ·  Quantum Optimization for Energy Grid Resilience", margin, 42, 10, gray);
 
-  // Metadata
   const now = new Date();
   const dateStr = now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
   const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
@@ -90,7 +81,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
 
   drawLine(66);
 
-  // ── Technical Metrics Grid ──
   drawText("Technical Metrics", margin, 78, 14, white, "bold");
 
   const cardW = (contentW - 9) / 4;
@@ -102,7 +92,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
   drawMetricCard(margin + (cardW + 3) * 2, cardY, cardW, cardH, "MEPS", simData.metrics.meps);
   drawMetricCard(margin + (cardW + 3) * 3, cardY, cardW, cardH, "Circuit Depth", String(simData.metrics.depth));
 
-  // ── Simulation Results ──
   drawLine(124);
   drawText("Simulation Results", margin, 136, 14, white, "bold");
 
@@ -131,11 +120,9 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
     rowY += 9;
   }
 
-  // ── Top Bitstrings Table ──
   drawLine(rowY + 4);
   drawText("Measurement Results — Top Bitstrings", margin, rowY + 16, 14, white, "bold");
 
-  // Table header
   let tY = rowY + 24;
   pdf.setFillColor("#1E293B");
   pdf.rect(margin, tY - 4, contentW, 8, "F");
@@ -158,9 +145,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
     tY += 8;
   });
 
-  // ════════════════════════════════════════
-  // PAGE 2 — Dashboard Charts
-  // ════════════════════════════════════════
   pdf.addPage();
   drawBackground();
   pdf.setFillColor(cyan);
@@ -171,7 +155,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
 
   let chartY = 36;
 
-  // Capture each chart panel
   const panels = [
     { id: "chart-graph", label: "Graph Visualization" },
     { id: "chart-sustainability", label: "Sustainability Scorecard" },
@@ -194,7 +177,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
       const x = margin + col * (imgW + 4);
       const y = chartY + row * (imgH + 14);
 
-      // Check if we need a new page
       if (y + imgH + 10 > pageH) {
         pdf.addPage();
         drawBackground();
@@ -208,7 +190,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
     }
   }
 
-  // ── AI Analysis Summary (last section on page 2 or new page) ──
   const aiY = chartY + 2 * (((contentW - 4) / 2) * 0.7 + 14) + 10;
 
   if (aiY + 30 < pageH) {
@@ -221,7 +202,6 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
     pdf.text(lines, margin, aiY + 18);
   }
 
-  // ── Footer on each page ──
   const totalPages = pdf.getNumberOfPages();
   for (let p = 1; p <= totalPages; p++) {
     pdf.setPage(p);
@@ -229,6 +209,5 @@ export async function exportReport({ simData, nodeCount, edgeCount, filename }: 
     drawText(`Page ${p} of ${totalPages}`, pageW - margin - 20, pageH - 8, 7, darkGray);
   }
 
-  // ── Save ──
   pdf.save(`QAOA-Report-${now.toISOString().slice(0, 10)}.pdf`);
 }

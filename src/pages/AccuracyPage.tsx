@@ -1,7 +1,6 @@
 export function AccuracyPage() {
   return (
     <>
-      {/* Section 1 — QAOA Results */}
       <section className="bg-bg-base pt-28 pb-16 lg:pb-24">
         <div className="mx-auto max-w-[800px] px-6 text-center">
           <h2 className="mb-10 text-[20px] font-bold leading-[1.4] text-text-secondary sm:text-[24px]">
@@ -15,7 +14,6 @@ export function AccuracyPage() {
         </div>
       </section>
 
-      {/* Section 2 — Probabilistic Results */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[800px] px-6 text-center">
           <h2 className="mb-10 text-[20px] font-bold leading-[1.4] text-text-secondary sm:text-[24px]">
@@ -29,7 +27,6 @@ export function AccuracyPage() {
         </div>
       </section>
 
-      {/* Section 3 — Classical GS Results */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[800px] px-6 text-center">
           <h2 className="mb-10 text-[20px] font-bold leading-[1.4] text-text-secondary sm:text-[24px]">
@@ -43,7 +40,6 @@ export function AccuracyPage() {
         </div>
       </section>
 
-      {/* Section 4 — Comparison of All Results */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[800px] px-6 text-center">
           <h2 className="mb-10 text-[20px] font-bold leading-[1.4] text-text-primary sm:text-[24px]">
@@ -57,7 +53,6 @@ export function AccuracyPage() {
         </div>
       </section>
 
-      {/* Section 5 — Hardware Execution */}
       <section className="bg-bg-base py-16 lg:py-24">
         <div className="mx-auto max-w-[800px] px-6 text-center">
           <h2 className="mb-10 text-[20px] font-bold leading-[1.4] text-text-primary sm:text-[24px]">

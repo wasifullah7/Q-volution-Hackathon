@@ -51,7 +51,6 @@ export function Footer() {
     <footer className="border-t border-border-subtle bg-bg-base py-12 lg:py-16">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-6 lg:gap-12">
-          {/* Logo Column */}
           <div className="lg:col-span-2">
             <Link to="/" className="mb-5 inline-block">
               <Logo size="md" />
@@ -73,7 +72,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Link Columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
               <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.05em] text-text-secondary">
@@ -95,7 +93,6 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Bottom Row */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border-subtle pt-8 md:flex-row">
           <p className="text-[12px] text-text-tertiary">
             &copy; 2025 - Ele-Q-tric

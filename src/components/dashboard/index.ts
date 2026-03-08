@@ -3,5 +3,5 @@ export { GraphVisualization } from "./GraphVisualization";
 export { MeasurementResults } from "./MeasurementResults";
 export { TechnicalMetrics } from "./TechnicalMetrics";
 export { AIAnalysis } from "./AIAnalysis";
-export { SustainabilityScorecard } from "./SustainabilityScorecard";
+export { ProbabilityOfResults } from "./ProbabilityOfResults";
 export { StateDistribution } from "./StateDistribution";

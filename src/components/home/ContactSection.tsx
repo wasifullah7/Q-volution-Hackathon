@@ -3,7 +3,6 @@ export function ContactSection() {
     <section id="contact" className="bg-bg-base py-16 lg:py-24">
       <div className="mx-auto max-w-[1400px] px-6 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 lg:items-center">
-          {/* Left Column */}
           <div>
             <div className="mb-3 text-[11px] font-semibold uppercase tracking-[0.05em] text-accent-primary">
               GET IN TOUCH
@@ -16,7 +15,6 @@ export function ContactSection() {
             </p>
           </div>
 
-          {/* Right Column - Form */}
           <div className="rounded-xl border border-border-subtle bg-bg-surface-1 p-6 lg:p-8">
             <h3 className="mb-6 text-[18px] font-bold text-text-primary">
               Send Us a Message

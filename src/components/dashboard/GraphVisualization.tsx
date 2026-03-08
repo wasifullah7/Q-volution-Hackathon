@@ -167,105 +167,70 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
   };
 
   const nodeCanvasObject = (node: FGNode, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const C = colorsRef.current;
+    const COLORS = colorsRef.current;
     const id = String(node.id ?? "");
     const label = (node.label as string) ?? id;
     const x = node.x ?? 0;
     const y = node.y ?? 0;
     const isHovered = hoveredNodeRef.current?.id === node.id;
-    const isNeighborHighlighted = highlightNodesRef.current.has(id);
     const sol = solutionRef.current;
     const hasSol = sol !== null && sol.size > 0;
 
-    let fillColor: string;
-    let strokeColor: string;
+    let fillColor = "#1f77b4";
 
     if (hasSol) {
       const partition = sol!.get(id);
       if (partition === 1) {
-        fillColor = C.partition1Fill;
-        strokeColor = C.partition1;
+        fillColor = "#ff7f0e";
       } else {
-        fillColor = C.partition0Fill;
-        strokeColor = C.partition0;
+        fillColor = "#1f77b4";
       }
-    } else {
-      fillColor = C.nodeFill;
-      strokeColor = C.nodeStroke;
     }
 
-    const radius = isHovered ? 8 : 6;
-
-    if (isHovered || isNeighborHighlighted) {
-      ctx.save();
-      ctx.shadowColor = strokeColor;
-      ctx.shadowBlur = isHovered ? 20 : 10;
-      ctx.beginPath();
-      ctx.arc(x, y, radius + 3, 0, Math.PI * 2);
-      ctx.fillStyle = "transparent";
-      ctx.fill();
-      ctx.restore();
-    }
+    const radius = 10;
 
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.fillStyle = fillColor;
     ctx.fill();
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = isHovered ? 2.5 : 1.5;
-    ctx.stroke();
 
-    ctx.beginPath();
-    ctx.arc(x, y, 2, 0, Math.PI * 2);
-    ctx.fillStyle = strokeColor;
-    ctx.fill();
+    ctx.font = `8px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = COLORS.bg === "#ffffff" ? "#ffffff" : "#000000"; // Assuming label should be readable in the dot if it's solid, wait no - let's make it always white or black based on the theme. Actually the dot is blue. So white text in a dark blue dot is fine, or black text.
+    ctx.fillStyle = "#ffffff";
+    ctx.fillText(label, x, y);
 
-    if (globalScale > 1.5 || isHovered) {
-      const fontSize = Math.max(10 / globalScale, 3.5);
-      ctx.font = `${isHovered ? 600 : 500} ${fontSize}px "Inter", sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "top";
-      ctx.fillStyle = isHovered ? C.label : C.labelDim;
-      ctx.fillText(label, x, y + radius + 3);
+    if (isHovered) {
+      ctx.strokeStyle = COLORS.label;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
     }
   };
 
   const linkColor = (link: FGLink) => {
-    const C = colorsRef.current;
-    const sId = getLinkEndpointId(link.source);
-    const tId = getLinkEndpointId(link.target);
-    const hKey1 = `${sId}-${tId}`;
-    const hKey2 = `${tId}-${sId}`;
-    const isHover = highlightLinksRef.current.has(hKey1) || highlightLinksRef.current.has(hKey2);
+    const COLORS = colorsRef.current;
     const sol = solutionRef.current;
     const hasSol = sol !== null && sol.size > 0;
-
     if (hasSol) {
+      const sId = getLinkEndpointId(link.source);
+      const tId = getLinkEndpointId(link.target);
       const cut = isCutEdge({ source: sId, target: tId }, sol!);
-      if (isHover) return cut ? C.cutEdge : C.hoverEdge;
-      return cut ? C.cutEdge : C.nonCutEdge;
+      return cut ? "#ff0000" : COLORS.labelDim;
     }
-
-    return isHover ? C.hoverEdge : C.edge;
+    return COLORS.labelDim;
   };
 
   const linkWidth = (link: FGLink) => {
-    const C = colorsRef.current;
-    const sId = getLinkEndpointId(link.source);
-    const tId = getLinkEndpointId(link.target);
-    const hKey1 = `${sId}-${tId}`;
-    const hKey2 = `${tId}-${sId}`;
-    const isHover = highlightLinksRef.current.has(hKey1) || highlightLinksRef.current.has(hKey2);
     const sol = solutionRef.current;
     const hasSol = sol !== null && sol.size > 0;
-
     if (hasSol) {
+      const sId = getLinkEndpointId(link.source);
+      const tId = getLinkEndpointId(link.target);
       const cut = isCutEdge({ source: sId, target: tId }, sol!);
-      if (isHover) return cut ? 3.5 : C.hoverEdgeWidth;
-      return cut ? C.cutEdgeWidth : C.nonCutEdgeWidth;
+      return cut ? 2 : 1;
     }
-
-    return isHover ? C.hoverEdgeWidth : C.edgeWidth;
+    return 1;
   };
 
   const cutEdgeCount = hasSolution
@@ -273,31 +238,28 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
     : 0;
 
   return (
-    <div className="flex h-full flex-col rounded-lg border border-border-subtle bg-bg-surface-1">
-      {/* Card Header */}
-      <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3">
-        <div className="flex items-center gap-2">
-          <CircuitBoard className="h-4 w-4 text-accent-primary" />
-          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-accent-primary">
-            Quantum Circuit Visualizer
-          </h3>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="primary">Nodes: {graph.nodes.length}</Badge>
-          <Badge variant="secondary">Edges: {graph.links.length}</Badge>
-          {hasSolution && (
-            <Badge variant="warning">
-              Cut: {cutEdgeCount} / {graph.links.length}
-            </Badge>
-          )}
-        </div>
+    <div className="flex h-full flex-col rounded-lg border border-border-subtle bg-bg-surface-1 transition-colors duration-300">
+      {/* Outer Header */}
+      <div className="flex items-center gap-2 border-b border-border-subtle p-5 pb-3">
+        <CircuitBoard className="h-4 w-4 text-accent-primary" />
+        <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-accent-primary">
+          Graph Partitioning
+        </h3>
       </div>
 
-      {/* Graph Canvas */}
-      <div
-        ref={containerRef}
-        className="relative flex-1 overflow-hidden"
-      >
+      <div className="flex flex-1 flex-col p-2 min-h-0">
+        {/* Inner header */}
+        <div className="relative flex items-center justify-center py-2 pb-4">
+          <h3 className="font-sans text-[15px] text-text-primary tracking-normal font-medium">
+            Representative Light-Cone Subgraph
+          </h3>
+        </div>
+        
+        {/* Graph Canvas */}
+        <div
+          ref={containerRef}
+          className="relative flex-1 overflow-hidden rounded-md min-h-0 w-full"
+        >
         <ForceGraph2D
           ref={fgRef}
           width={dimensions.width}
@@ -307,7 +269,7 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
           nodeCanvasObject={nodeCanvasObject}
           nodePointerAreaPaint={(node: FGNode, color: string, ctx: CanvasRenderingContext2D) => {
             ctx.beginPath();
-            ctx.arc(node.x ?? 0, node.y ?? 0, 12, 0, Math.PI * 2);
+            ctx.arc(node.x ?? 0, node.y ?? 0, 10, 0, Math.PI * 2);
             ctx.fillStyle = color;
             ctx.fill();
           }}
@@ -327,45 +289,10 @@ export function GraphVisualization({ graph, solution }: GraphVisualizationProps)
           maxZoom={15}
         />
 
-        {hasSolution && (
-          <div className="absolute bottom-3 left-3 rounded-lg border border-border-subtle bg-bg-surface-1/90 px-3 py-2 backdrop-blur-sm">
-            <p className="mb-1.5 font-display text-[10px] font-semibold uppercase tracking-wider text-text-secondary">
-              Max-Cut Solution
-            </p>
-            <div className="flex flex-col gap-1 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full border-2" style={{ borderColor: COLORS.partition0, backgroundColor: COLORS.partition0Fill }} />
-                <span className="text-text-secondary">Partition 0</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="h-3 w-3 rounded-full border-2" style={{ borderColor: COLORS.partition1, backgroundColor: COLORS.partition1Fill }} />
-                <span className="text-text-secondary">Partition 1</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="rounded" style={{ backgroundColor: COLORS.cutEdge, width: 14, height: 3 }} />
-                <span className="text-text-secondary">Cut edge</span>
-              </div>
-            </div>
-          </div>
-        )}
 
-        {hoveredNodeDisplay && (
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-lg border border-border-subtle bg-bg-surface-1/90 px-3 py-2 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <span className="font-display text-sm font-semibold text-accent-primary">
-                {(hoveredNodeDisplay.label as string) ?? String(hoveredNodeDisplay.id)}
-              </span>
-              <span className="text-xs text-text-tertiary">
-                {neighborMap.current.get(hoveredNodeDisplay.id!)?.size ?? 0} connections
-              </span>
-              {hasSolution && (
-                <span className="text-xs" style={{ color: solution!.get(String(hoveredNodeDisplay.id)) === 1 ? COLORS.partition1 : COLORS.partition0 }}>
-                  Partition {solution!.get(String(hoveredNodeDisplay.id)) ?? "?"}
-                </span>
-              )}
-            </div>
-          </div>
-        )}
+
+
+        </div>
       </div>
     </div>
   );
