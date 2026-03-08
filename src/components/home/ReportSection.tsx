@@ -46,12 +46,23 @@ export function ReportSection() {
 
     <li>
       <a
-        href="https://www.linkedin.com/in/rafimr"
+        href="https://www.linkedin.com/in/rafimr/?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app"
         target="_blank"
         rel="noopener noreferrer"
         className="hover:underline"
       >
-        Rafia German
+        Rafia 
+      </a>
+    </li>
+
+    <li>
+      <a
+        href="https://www.linkedin.com/in/ifrah-asif-1945b6139"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="hover:underline"
+      >
+        Ifrah Asif
       </a>
     </li>
 
