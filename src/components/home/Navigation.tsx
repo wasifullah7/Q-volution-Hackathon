@@ -20,14 +20,12 @@ export function Navigation() {
   return (
     <header className="fixed left-0 right-0 top-0 z-50 border-b border-border-subtle bg-bg-surface-1/80 backdrop-blur-xl">
       <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-6 lg:px-10">
-        {/* Logo */}
         <div className="flex items-center">
           <Link to="/">
             <Logo size="sm" />
           </Link>
         </div>
 
-        {/* Desktop Navigation - Centered */}
         <nav className="hidden flex-1 items-center justify-center gap-7 md:flex">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
@@ -35,11 +33,10 @@ export function Navigation() {
               <Link
                 key={link.label}
                 to={link.href}
-                className={`text-[12px] font-medium transition-colors hover:text-text-primary ${
-                  isActive
+                className={`text-[12px] font-medium transition-colors hover:text-text-primary ${isActive
                     ? "text-accent-primary"
                     : "text-text-secondary"
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>
@@ -47,7 +44,6 @@ export function Navigation() {
           })}
         </nav>
 
-        {/* Right Side - Search + Theme Toggle + CTA */}
         <div className="hidden items-center gap-3 md:flex">
           <button className="flex h-8 w-8 items-center justify-center text-text-secondary transition-colors hover:text-text-primary">
             <Search className="h-4 w-4" />
@@ -70,7 +66,6 @@ export function Navigation() {
           </a>
         </div>
 
-        {/* Mobile Menu Button */}
         <div className="flex items-center gap-2 md:hidden">
           <button
             onClick={toggleTheme}
@@ -91,7 +86,6 @@ export function Navigation() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="border-t border-border-subtle bg-bg-surface-1 px-6 py-4 md:hidden">
           <nav className="flex flex-col gap-2">
@@ -101,11 +95,10 @@ export function Navigation() {
                 <Link
                   key={link.label}
                   to={link.href}
-                  className={`py-2 text-[13px] ${
-                    isActive
+                  className={`py-2 text-[13px] ${isActive
                       ? "text-accent-primary font-medium"
                       : "text-text-secondary"
-                  }`}
+                    }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}

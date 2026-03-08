@@ -1,12 +1,10 @@
 export function ProblemSection() {
   return (
     <section className="relative overflow-hidden bg-bg-base pt-20 pb-32">
-      {/* Gradient Lighting Effect */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,var(--color-bg-surface-2)_0%,var(--color-bg-base)_100%)] opacity-50" />
 
       <div className="relative z-10 mx-auto max-w-[1000px] px-6 lg:px-0">
         <div className="flex flex-col">
-          {/* Section Header */}
           <div className="mb-16 w-full">
             <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-accent-primary">Problem Statement</div>
             <h2 className="max-w-[800px] text-[32px] font-bold leading-[1.2] tracking-[-0.03em] text-text-primary sm:text-[36px]">
@@ -15,9 +13,7 @@ export function ProblemSection() {
             </h2>
           </div>
 
-          {/* Main Content Grid */}
           <div className="grid w-full gap-16 lg:grid-cols-[1.2fr_1fr] lg:items-start">
-            {/* Left Column - Details */}
             <div className="space-y-10">
               <div className="space-y-6">
                 <h3 className="text-[18px] font-bold leading-tight text-text-primary">
@@ -42,7 +38,6 @@ export function ProblemSection() {
               </a>
             </div>
 
-            {/* Right Column - SC Grid Image */}
             <div className="relative flex flex-col items-center lg:items-end">
               <div className="w-full max-w-[400px]">
                 <img

@@ -10,11 +10,9 @@ export function StatsSection() {
 
   return (
     <section id="accuracy" className="relative overflow-hidden bg-bg-base py-24 lg:py-32">
-      {/* Gradient Lighting Effect */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,var(--color-bg-surface-2)_0%,var(--color-bg-base)_100%)] opacity-50" />
 
       <div className="relative z-10 mx-auto max-w-[1000px] px-6 lg:px-0">
-        {/* Section Header */}
         <div className="mb-20 text-left">
           <div className="mb-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-text-tertiary">Our solution</div>
           <h2 className="text-[32px] font-bold leading-[1.2] tracking-[-0.03em] text-text-primary sm:text-[36px]">
@@ -22,9 +20,7 @@ export function StatsSection() {
           </h2>
         </div>
 
-        {/* Stats and Details Grid */}
         <div className="grid gap-20 lg:grid-cols-2">
-          {/* Left Column - Stats Grid */}
           <div className="grid grid-cols-2 gap-x-12 gap-y-16">
             {stats.map((stat, index) => (
               <div key={index} className="space-y-2">
@@ -38,7 +34,6 @@ export function StatsSection() {
             ))}
           </div>
 
-          {/* Right Column - Solution Details */}
           <div className="space-y-10 lg:pt-2">
             <div className="space-y-6">
               <h3 className="text-[18px] font-bold text-text-primary">Our Solution</h3>
