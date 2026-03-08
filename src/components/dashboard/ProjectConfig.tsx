@@ -112,19 +112,33 @@ export function ProjectConfig({
           }`}
         >
           <FileText className="h-7 w-7 text-accent-primary" />
-          <span className="max-w-full truncate font-mono text-sm text-accent-primary">
-            {displayName}
-          </span>
           {hasGraph ? (
-            <span className="tabular-nums text-[11px] text-text-tertiary">
-              {nodeCount} nodes &middot; {edgeCount} edges
-            </span>
+            <>
+              <span className="max-w-full truncate font-mono text-sm text-accent-primary">
+                {displayName}
+              </span>
+              <span className="tabular-nums text-[11px] text-text-tertiary">
+                {nodeCount} nodes &middot; {edgeCount} edges
+              </span>
+            </>
           ) : (
-            <span className="text-[11px] text-text-tertiary">
-              Click or drop to replace
-            </span>
+            <>
+              <span className="text-sm text-text-secondary">Drop .gml or graph file</span>
+              <span className="text-[11px] text-text-tertiary">
+                Supports .gml, .json, .csv, .txt, .tsv, .edgelist
+              </span>
+            </>
           )}
         </div>
+
+        <Button
+          variant="outline"
+          size="md"
+          className="w-full"
+          onClick={() => onLoadDemo(9, 0.6)}
+        >
+          Load Demo Graph
+        </Button>
 
         {error && (
           <div className="flex items-start gap-2 rounded-md bg-error/10 px-2.5 py-2 text-xs text-error">
@@ -183,11 +197,8 @@ export function ProjectConfig({
         <Button
           size="lg"
           className="w-full text-base font-semibold"
-          onClick={() => {
-            if (!hasGraph) onLoadDemo(9, 0.6);
-            onRunSolution();
-          }}
-          disabled={isLoading}
+          onClick={onRunSolution}
+          disabled={isLoading || !hasGraph}
         >
           {isLoading ? (
             <>

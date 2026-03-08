@@ -8,6 +8,7 @@ import {
   AIAnalysis,
   ProbabilityOfResults,
   StateDistribution,
+  ChartPlaceholder,
 } from "@/components/dashboard";
 import { FullscreenCard } from "@/components/ui/FullscreenCard";
 import { useGraphData } from "@/hooks/useGraphData";
@@ -40,18 +41,13 @@ export function DashboardPage() {
   const handleRunSimulation = useCallback(() => {
     setSimStatus("loading");
 
-    // Load demo graph if empty
-    if (graph.nodes.length === 0) {
-      loadDemo(9, 0.6);
-    }
-
     // Simulate loading delay, then show results
     setTimeout(() => {
       runSolution();
       setSimData(COMPLETED_SIMULATION);
       setSimStatus("completed");
     }, 2500);
-  }, [graph.nodes.length, loadDemo, runSolution]);
+  }, [runSolution]);
 
   const handleClearSolution = useCallback(() => {
     clearSolution();
@@ -113,28 +109,44 @@ export function DashboardPage() {
           {/* Top Left - Quantum Circuit Visualizer */}
           <FullscreenCard>
             <div id="chart-graph" className="flex h-full w-full flex-col overflow-hidden">
-              <GraphVisualization graph={graph} solution={solution} />
+              {simStatus === "idle" ? (
+                <ChartPlaceholder />
+              ) : (
+                <GraphVisualization graph={graph} solution={solution} />
+              )}
             </div>
           </FullscreenCard>
 
           {/* Top Right - Probability of Results */}
           <FullscreenCard>
             <div id="chart-sustainability" className="flex h-full w-full flex-col overflow-hidden">
-              <ProbabilityOfResults />
+              {simStatus === "idle" ? (
+                <ChartPlaceholder />
+              ) : (
+                <ProbabilityOfResults />
+              )}
             </div>
           </FullscreenCard>
 
           {/* Bottom Left - State Distribution */}
           <FullscreenCard>
             <div id="chart-distribution" className="flex h-full w-full flex-col overflow-hidden">
-              <StateDistribution />
+              {simStatus === "idle" ? (
+                <ChartPlaceholder />
+              ) : (
+                <StateDistribution />
+              )}
             </div>
           </FullscreenCard>
 
           {/* Bottom Right - Measurement Results */}
           <FullscreenCard>
             <div id="chart-measurements" className="flex h-full w-full flex-col overflow-hidden">
-              <MeasurementResults />
+              {simStatus === "idle" ? (
+                <ChartPlaceholder />
+              ) : (
+                <MeasurementResults />
+              )}
             </div>
           </FullscreenCard>
         </div>

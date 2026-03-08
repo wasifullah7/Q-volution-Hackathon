@@ -32,10 +32,10 @@ export interface SimulationData {
 
 export const INITIAL_SIMULATION: SimulationData = {
   metrics: {
-    oneQubitGates: 22,
-    twoQubitGates: 29,
-    meps: "0.774",
-    depth: 26,
+    oneQubitGates: 0,
+    twoQubitGates: 0,
+    meps: "0",
+    depth: 0,
   },
   measurements: {
     entries: [
